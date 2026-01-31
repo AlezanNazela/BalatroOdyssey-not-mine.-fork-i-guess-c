@@ -7,7 +7,7 @@ return {
             j_odyssey_j_tribal_king_of_kings = { name = "King of Kings", text = { "{X:mult,C:white} X5 {} Mult.{}", "All played cards count", "as {C:attention}Kings{}" } },
             j_odyssey_j_transformations_apotheosis = { name = "Apotheosis", text = { "Transform all cards in", "deck into a single", "random Rank and Suit" } },
             j_odyssey_j_economy_credit_card_2 = { name = "Credit Card 2", text = { "Goes up to {C:money}-$#1#{} in debt{}" } },
-            j_odyssey_j_singularity_lonely_star = { name = "Lonely Star", text = { "If this is the only Joker", "and you win the round:", "Gains {X:mult,C:white} X#1# {} Mult{}", "{C:inactive}(Currently {}{X:mult,C:white} X#2# {} Mult){}" } },
+            j_odyssey_j_singularity_lonely_star = { name = "Lonely Star", text = { "If this is the only Joker", "and you win the round:", "Gains {X:mult,C:white} X#2# {} Mult{}", "{C:inactive}(Currently {}{X:mult,C:white} X#1# {} Mult){}" } },
  j_odyssey_j_anomaly_anomalous_echo = {
  name = "Anomalous Echo",
  text = {
@@ -284,7 +284,7 @@ return {
  j_odyssey_j_anomaly_unstable_wormhole = {
  name = "Unstable Wormhole",
  text = {
- "{X:mult,C:white} X#1# {} Mult{}", "{C:green}1 in #3#{} chance to destroy{}", "adjacent Joker"
+ "{X:mult,C:white} X#1# {} Mult{}", "{C:green}#2# in #3#{} chance to destroy{}", "adjacent Joker"
  }
  },
  
@@ -4958,7 +4958,7 @@ j_odyssey_j_professions_student = {
  j_odyssey_j_quantum_schrodinger = {
  name = "Schrödinger",
  text = {
- "Until triggered, has {C:attention}ALL{}", "simultaneous effects", "{C:mult}+#1#{} Mult{}"
+ "{C:mult}+#1#{} Mult, {C:chips}+#2#{} Chips,{}", "and gain {C:money}$#3#{} per hand.{}", "{C:green}#4# in #5#{} chance to be destroyed{}", "after hand played"
  }
  },
  
@@ -5287,7 +5287,7 @@ j_odyssey_j_professions_student = {
  j_odyssey_j_singularity_solidification = {
  name = "Solidification",
  text = {
- "If stayed in {C:attention}same position{}", "for {C:attention}5 rounds{}, gain {}{X:mult,C:white} X#2# {} Mult{}", "{C:inactive}(Currently #1#/5 rounds){}"
+ "If stayed in {C:attention}same position{}", "for {C:attention}5 rounds{}, gain {}{X:mult,C:white} X#3# {} Mult{}", "{C:inactive}(Currently #1#/#2# rounds){}"
  }
  },
  
@@ -5833,7 +5833,7 @@ j_odyssey_j_professions_student = {
  j_odyssey_j_temporal_limbo = {
  name = "Limbo",
  text = {
- "Between {C:attention}existence{} and {}{C:attention}non-existence{}", "{C:green}#2# in #3# chance{} of {}{X:mult,C:white} X#1# {} Mult{}"
+ "Between {C:attention}existence{} and {}{C:attention}non-existence{}.", "{C:green}#2# in #3#{} chance of {}{X:mult,C:white} X#1# {} Mult{}"
  }
  },
  
