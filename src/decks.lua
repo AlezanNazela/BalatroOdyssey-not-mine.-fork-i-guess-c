@@ -854,15 +854,7 @@ SMODS.Back({
     key = 'ethereal',
     atlas = 'b_ethereal',
     pos = { x = 0, y = 0 },
-    config = {},
-    apply = function(self)
-        -- Logic handled in 03_vanilla_override (or standard Steamodded config?)
-        -- Actually we need to hook into usage rate.
-        -- Base game uses G.GAME.modifiers.spectral_rate or similar? No, only tarot/planet usually.
-        -- Standard shop generation: G.E_MANAGER adds cards.
-        -- We can set a flag G.GAME.modifiers.odyssey_ethereal_shop = true
-        G.GAME.modifiers.odyssey_ethereal_shop = true
-    end
+    config = { spectral_rate = 200 }  -- Same as Ghost Deck in base game
 })
 
 -- 62. Baralho Baralho Radioativo

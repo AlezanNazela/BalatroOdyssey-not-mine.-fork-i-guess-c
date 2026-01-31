@@ -144,10 +144,10 @@ end
 
 -- Helper: Get Active Spectral Effects for Run Info
 function get_active_spectrals()
-    local effects = {}
-    local displayed_ids = {} -- Track which IDs we have already shown to avoid dupes
-
-    -- Mapping from variable name to Spectral ID (for localization)
+    local spectral_usage = {}  -- Track usage count per spectral ID
+    local spectral_info = {}   -- Track name and effect text per spectral ID
+    
+    -- Mapping from variable name to Spectral ID
     local var_to_id = {
         ['odyssey_sharma_active'] = 95,
         ['odyssey_yang_active'] = 94,
@@ -164,109 +164,134 @@ function get_active_spectrals()
         ['odyssey_hopper_active'] = 66,
     }
 
-    -- 1. Scan G.GAME for known Odyssey variables (Primary Source for Active Values)
-    for k, v in pairs(G.GAME) do
-        if type(k) == 'string' and k:find('odyssey_') then
-            local should_show = false
-            local name = k
-            local text = tostring(v)
-            local sort_priority = 0
-            local current_id = nil
-
-            -- Case A: Generic Spectral XMult (odyssey_spectral_ID_xmult)
-            local id_xmult = k:match("odyssey_spectral_(%d+)_xmult")
-            if id_xmult then
-                if type(v) == 'number' and v > 1 then
-                    should_show = true
-                    current_id = tonumber(id_xmult)
-                    name = localize('spectral_' .. id_xmult)
-                    text = localize{type='variable', key='k_active_spectral_'..id_xmult, vars={v}}
-                    sort_priority = 1
-                end
-            
-            -- Case B: Named Active Flags
-            elseif var_to_id[k] then
-                if v then
-                    should_show = true
-                    current_id = var_to_id[k]
-                    name = localize('spectral_' .. current_id)
-                    text = localize('k_active_spectral_' .. current_id)
-                    if text == 'ERROR' then text = "Active" end
-                    sort_priority = 2
-                end
-
-            -- Case C: Zero Absolute
-            elseif k == 'odyssey_zero_absolute' then
-                 if not G.GAME.odyssey_spectral_14_xmult and v then
-                      should_show = true
-                      current_id = 14
-                      name = localize('spectral_14')
-                      text = "Active"
-                 end
-            
-            -- Case D: Temporary Next Hand Effects
-            elseif k:find("_next_xmult") then
-                if v and v > 1 then
-                    should_show = true
-                    local id_next = k:match("odyssey_spectral_(%d+)_next_xmult")
-                    if id_next then
-                        current_id = tonumber(id_next)
-                        name = localize('spectral_' .. id_next)
-                        text = localize{type='variable', key='k_active_spectral_'..id_next, vars={v}} .. " (Next Hand)"
-                    else
-                        name = k:gsub("odyssey_", ""):gsub("_", " "):gsub("^%l", string.upper)
-                        text = "X" .. tostring(v) .. " (Next Hand)"
-                    end
-                end
-
-            -- Case E: Catch-all for other Odyssey variables
-            elseif v then
-                -- Hide 0s and falses
-                if (type(v) == 'number' and v ~= 0) or (type(v) == 'boolean' and v == true) or (type(v) == 'string') then
-                    should_show = true
-                    name = k:gsub("odyssey_", ""):gsub("_", " ")
-                    name = name:gsub("(%a)([%w_']*)", function(first, rest) return first:upper()..rest:lower() end)
-                    
-                    if type(v) == 'boolean' and v == true then
-                        text = localize('k_active') -- "Active"
-                    else
-                        text = tostring(v)
-                    end
-                    sort_priority = 99
-                end
+    -- Helper function to get spectral card name
+    local function get_spectral_name(id)
+        -- First try localization (how the base game does it)
+        local card_key = 'c_odyssey_spectral_' .. id
+        local loc_name = localize{type = 'name_text', set = 'Spectral', key = card_key}
+        if loc_name and loc_name ~= '' and not loc_name:find('ERROR') then
+            return loc_name
+        end
+        
+        -- Then try G.P_CENTERS with different key formats
+        local possible_keys = {
+            card_key,
+            'c_spectral_' .. id,
+            'spectral_' .. id
+        }
+        
+        for _, key in ipairs(possible_keys) do
+            if G.P_CENTERS[key] and G.P_CENTERS[key].name then
+                return G.P_CENTERS[key].name
             end
+        end
+        
+        -- Last resort: return a readable fallback
+        return "Spectral #" .. id
+    end
 
-            if should_show then
-                 if current_id then displayed_ids[current_id] = true end
-                 table.insert(effects, { name = name, text = text, priority = sort_priority })
+    -- Helper function to register a spectral usage
+    local function register_spectral(id, effect_text)
+        spectral_usage[id] = (spectral_usage[id] or 0) + 1
+        if not spectral_info[id] then
+            spectral_info[id] = {
+                name = get_spectral_name(id),
+                effects = {}
+            }
+        end
+        -- Add effect if not already tracked
+        if effect_text and not spectral_info[id].effects[effect_text] then
+            spectral_info[id].effects[effect_text] = true
+        end
+    end
+
+    -- 1. Scan G.GAME for active spectral effects
+    if G.GAME then
+        for k, v in pairs(G.GAME) do
+            if type(k) == 'string' and k:find('odyssey_') then
+                local id = nil
+                local effect_text = nil
+                
+                -- Case A: Generic Spectral XMult (odyssey_spectral_ID_xmult)
+                local id_xmult = k:match("odyssey_spectral_(%d+)_xmult")
+                if id_xmult and type(v) == 'number' and v > 1 then
+                    id = tonumber(id_xmult)
+                    effect_text = "X" .. tostring(v) .. " Mult"
+                
+                -- Case B: Named Active Flags
+                elseif var_to_id[k] and v then
+                    id = var_to_id[k]
+                    effect_text = "Active"
+                
+                -- Case C: Zero Absolute
+                elseif k == 'odyssey_zero_absolute' and v then
+                    id = 14
+                    effect_text = "Active"
+                
+                -- Case D: Temporary Next Hand Effects
+                elseif k:find("_next_xmult") then
+                    local id_next = k:match("odyssey_spectral_(%d+)_next_xmult")
+                    if id_next and v and v > 1 then
+                        id = tonumber(id_next)
+                        effect_text = "X" .. tostring(v) .. " Mult (Next Hand)"
+                    end
+                end
+                
+                if id then
+                    register_spectral(id, effect_text)
+                end
             end
         end
     end
 
-    -- 2. Scan History for Used Spectrals (Fallback for "One-off" or missing effects)
-    if G.GAME.odyssey_history then
-        for id, used in pairs(G.GAME.odyssey_history) do
-            if used and not displayed_ids[id] then
-                -- If we haven't shown this ID yet (meaning it has no active variable being tracked above)
-                -- We show it as "Used" or try to find generic text
-                
-                local name = localize('spectral_' .. id)
-                if name == "ERROR" then name = "Spectral " .. id end
-                
-                -- Try to find specific active text, otherwise fallback
-                local text = localize('k_active_spectral_' .. id)
-                if text == "ERROR" then text = "Used" end
-
-                table.insert(effects, { name = name, text = text, priority = 3 })
-                displayed_ids[id] = true -- Mark as shown
+    -- 2. Scan History for all used spectrals
+    if G.GAME and G.GAME.odyssey_history then
+        for id, count in pairs(G.GAME.odyssey_history) do
+            if type(count) == 'number' and count > 0 then
+                -- Register the spectral with its usage count
+                spectral_usage[id] = count
+                if not spectral_info[id] then
+                    spectral_info[id] = {
+                        name = get_spectral_name(id),
+                        effects = {}
+                    }
+                end
+            elseif count == true then
+                -- Old boolean format, just mark as used once
+                register_spectral(id, nil)
             end
         end
     end
     
-    -- Sort by priority then name
+    -- 3. Build the effects list
+    local effects = {}
+    for id, count in pairs(spectral_usage) do
+        local info = spectral_info[id]
+        local name = info.name
+        
+        -- Add count if used more than once
+        if count > 1 then
+            name = name .. " (" .. count .. ")"
+        end
+        
+        -- Combine all effects for this spectral
+        local effect_list = {}
+        for effect, _ in pairs(info.effects) do
+            table.insert(effect_list, effect)
+        end
+        
+        local text = #effect_list > 0 and table.concat(effect_list, ", ") or "Used"
+        
+        table.insert(effects, { 
+            name = name, 
+            text = text,
+            id = id  -- For sorting
+        })
+    end
+    
+    -- Sort by spectral ID
     table.sort(effects, function(a, b) 
-        if a.priority ~= b.priority then return a.priority < b.priority end
-        return a.name < b.name 
+        return a.id < b.id
     end)
 
     return effects
