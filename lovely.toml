@@ -14,7 +14,8 @@ payload = '''
             return { vars = { self.config.extra } }
         end
     elseif k == 'e_negative' then
-        v.loc_vars = function(self, info_queue, card) return { vars = {} } end
+        v.config.extra = 1
+        v.loc_vars = function(self, info_queue, card) return { vars = { self.config.extra or 1 } } end
     end
 '''
 match_indent = true

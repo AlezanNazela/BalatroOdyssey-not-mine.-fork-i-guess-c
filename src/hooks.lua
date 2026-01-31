@@ -510,9 +510,9 @@ G.FUNCS.end_round = function()
                         -- Use internal helper if available or manually change base.
                         -- SMODS usually provides easy ways?
                         -- Trying manual base update approach
-                         v.base.id = new_id
-                         v.base.value = G.id_def[new_id] -- This might be a string like '2', 'K'
-                         v:set_sprites(nil, v.config.card)
+                        v.base.id = new_id
+                        v.base.value = G.id_def[new_id] -- This might be a string like '2', 'K'
+                        v:set_sprites(nil, v.config.card)
                     end
                 end
                 play_sound('timpani')
@@ -1032,7 +1032,7 @@ SMODS.Enhancement({
 })
 
 -- 11. Luz (Light)
--- Effect: 1 in 4 chance to gain  when scored
+-- Effect: 1 in 4 chance to gain $3 when scored
 SMODS.Enhancement({
     key = 'light',
     atlas = 'enhancements',
@@ -1274,3 +1274,76 @@ SMODS.Enhancement({
 
 
 ----------------------------------------------
+-- 16. Hook Run Info to display Active Spectral Effects
+
+-- Helper to find the tab container
+-- Better Helper: Traverse and insert
+
+
+-- 
+-- RUN INFO UI HOOKS
+-- 
+
+-- Define the content for the Spectrals tab
+G.UIDEF.run_info_spectrals = function()
+    local active_spectrals = get_active_spectrals()
+    
+    local nodes = {}
+    if #active_spectrals == 0 then
+        table.insert(nodes, {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
+            {n=G.UIT.T, config={text = localize('k_no_active_spectrals'), scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+        }})
+    else
+        for _, effect in ipairs(active_spectrals) do
+            table.insert(nodes, {n=G.UIT.R, config={align = "cm", padding = 0.05, r = 0.1, colour = G.C.L_BLACK, emboss = 0.05, minw = 5, mb=0.1}, nodes={
+                {n=G.UIT.C, config={align = "cl", padding = 0.05, minw=4.8}, nodes={
+                    {n=G.UIT.R, config={align = "cl"}, nodes={
+                        {n=G.UIT.T, config={text = effect.name, scale = 0.45, colour = G.C.WHITE, shadow = true}}
+                    }},
+                    {n=G.UIT.R, config={align = "cl"}, nodes={
+                        {n=G.UIT.T, config={text = effect.text, scale = 0.35, colour = G.C.UI.TEXT_LIGHT}}
+                    }}
+                }}
+            }})
+        end
+    end
+
+    -- Return a generic container with our list of nodes
+    return {n=G.UIT.ROOT, config={align = "cm", colour = G.C.CLEAR}, nodes={
+        {n=G.UIT.R, config={align = "cm", minh = 0.5}, nodes={}},
+        {n=G.UIT.R, config={align = "cm", colour = G.C.BLACK, r = 1, padding = 0.15, emboss = 0.05}, nodes={
+             {n=G.UIT.C, config={align = "cm", padding = 0.1}, nodes=nodes}
+        }}
+    }}
+end
+
+-- Override G.UIDEF.run_info to include the Spectrals tab
+-- We fully redefine it to insert our tab into the list.
+G.UIDEF.run_info = function()
+  return create_UIBox_generic_options({contents ={create_tabs(
+    {tabs = {
+          {
+            label = localize('b_poker_hands'),
+            chosen = true,
+            tab_definition_function = create_UIBox_current_hands,
+        },
+        {
+          label = localize('b_blinds'),
+          tab_definition_function = G.UIDEF.current_blinds,
+        },
+        {
+            label = localize('b_vouchers'),
+            tab_definition_function = G.UIDEF.used_vouchers,
+        },
+        {
+            label = localize('k_spectral'),
+            tab_definition_function = G.UIDEF.run_info_spectrals,
+        },
+        G.GAME.stake > 1 and {
+          label = localize('b_stake'),
+          tab_definition_function = G.UIDEF.current_stake,
+        } or nil,
+    },
+    tab_h = 8,
+    snap_to_nav = true})}})
+end

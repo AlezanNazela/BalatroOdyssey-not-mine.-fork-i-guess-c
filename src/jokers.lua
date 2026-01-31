@@ -2920,7 +2920,7 @@ SMODS.Joker({
 SMODS.Joker({
     key = 'j_quantum_chrono_trigger',
     atlas = 'j_quantum_chrono_trigger',
-    config = { extra = { mult = 100, count = 0, trigger = 5 } },
+    config = { extra = { mult = 100, played = 0, trigger = 5 } },
     rarity = 2,
     pos = { x = 0, y = 0 },
     cost = 6,

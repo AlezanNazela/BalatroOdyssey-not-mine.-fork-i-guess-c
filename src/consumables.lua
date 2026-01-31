@@ -3,7 +3,7 @@ local tarot_max = {
     [4] = 2, [6] = 2, [7] = 1, [8] = 1, [9] = 1, [12] = 2, [13] = 2, [14] = 2,
     [16] = 1, [17] = 1, [18] = 3, [19] = 3, [20] = 3, [22] = 3, [25] = 3, [26] = 2, [27] = 3,
     [35] = 2, [36] = 2, [37] = 1, [38] = 1, [44] = 1, [45] = 1, [59] = 3, [69] = 1,
-    [84] = 1, [85] = 1, [86] = 1, [87] = 1, [88] = 1, [89] = 1, [90] = 1, [91] = 1, [92] = 1, [93] = 1, [94] = 1, [95] = 1, [96] = 1,
+    [84] = 1, [85] = 1, [86] = 1, [87] = 1, [88] = 1, [89] = 1, [90] = 1, [91] = 1, [92] = 1, [93] = 1, [94] = 1, [95] = 1, [96] = 2,
     [97] = 1, [98] = 1, [99] = 1, [100] = 1
 }
 
@@ -402,26 +402,38 @@ for _, t in ipairs(tarots) do
                     _joker:start_dissolve()
                 end
             elseif id == 62 then -- King
+                local suits = {'S','H','C','D'}
                 for i = 1, 2 do
-                    local _card = create_card("Base", G.hand, nil, nil, nil, nil, "S_K", "king")
+                    local _card = create_card("Base", G.hand, nil, nil, nil, nil, nil, "king")
+                    local suit = pseudorandom_element(suits, pseudoseed('king_gen'..i))
+                    _card:set_base(G.P_CARDS[suit..'_K'])
                     _card:add_to_deck()
                     G.hand:emplace(_card)
                 end
             elseif id == 63 then -- Queen
+                local suits = {'S','H','C','D'}
                 for i = 1, 2 do
-                    local _card = create_card("Base", G.hand, nil, nil, nil, nil, "H_Q", "queen")
+                    local _card = create_card("Base", G.hand, nil, nil, nil, nil, nil, "queen")
+                    local suit = pseudorandom_element(suits, pseudoseed('queen_gen'..i))
+                    _card:set_base(G.P_CARDS[suit..'_Q'])
                     _card:add_to_deck()
                     G.hand:emplace(_card)
                 end
             elseif id == 64 then -- Jack
+                local suits = {'S','H','C','D'}
                 for i = 1, 2 do
-                    local _card = create_card("Base", G.hand, nil, nil, nil, nil, "D_J", "jack")
+                    local _card = create_card("Base", G.hand, nil, nil, nil, nil, nil, "jack")
+                    local suit = pseudorandom_element(suits, pseudoseed('jack_gen'..i))
+                    _card:set_base(G.P_CARDS[suit..'_J'])
                     _card:add_to_deck()
                     G.hand:emplace(_card)
                 end
             elseif id == 65 then -- Ace
+                local suits = {'S','H','C','D'}
                 for i = 1, 2 do
-                    local _card = create_card("Base", G.hand, nil, nil, nil, nil, "C_A", "ace")
+                    local _card = create_card("Base", G.hand, nil, nil, nil, nil, nil, "ace")
+                    local suit = pseudorandom_element(suits, pseudoseed('ace_gen'..i))
+                    _card:set_base(G.P_CARDS[suit..'_A'])
                     _card:add_to_deck()
                     G.hand:emplace(_card)
                 end
@@ -1105,6 +1117,9 @@ local spectral_logic = {
     [63] = function(card, area, copier) -- Ford
          G.SETTINGS.GAMESPEED = 10
     end,
+    [66] = function(card, area, copier) -- Hopper
+        G.GAME.odyssey_hopper_active = true
+    end,
     [68] = function(card, area, copier) -- Jobs
         if G.hand.highlighted[1] then
             local c = G.hand.highlighted[1]
@@ -1243,6 +1258,10 @@ for _, s in ipairs(spectrals) do
         end,
         use = function(self, card, area, copier)
             local id = tonumber(self.key:match("spectral_(%d+)"))
+            -- Track history of used spectrals
+            if not G.GAME.odyssey_history then G.GAME.odyssey_history = {} end
+            G.GAME.odyssey_history[id] = true
+
             if spectral_logic[id] then
                 spectral_logic[id](card, area, copier)
             end

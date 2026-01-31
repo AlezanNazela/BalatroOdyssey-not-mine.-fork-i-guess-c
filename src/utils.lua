@@ -142,6 +142,136 @@ function create_popup_UIBox_tooltip(tooltip)
     return old_create_popup_UIBox_tooltip(tooltip)
 end
 
+-- Helper: Get Active Spectral Effects for Run Info
+function get_active_spectrals()
+    local effects = {}
+    local displayed_ids = {} -- Track which IDs we have already shown to avoid dupes
+
+    -- Mapping from variable name to Spectral ID (for localization)
+    local var_to_id = {
+        ['odyssey_sharma_active'] = 95,
+        ['odyssey_yang_active'] = 94,
+        ['odyssey_galileo_active'] = 39,
+        ['odyssey_newton_active'] = 40,
+        ['odyssey_einstein_active'] = 41,
+        ['odyssey_drake_active'] = 35,
+        ['odyssey_curie_active'] = 53,
+        ['odyssey_darwin_active'] = 54,
+        ['odyssey_vitalik_active'] = 74,
+        ['odyssey_vostok_active'] = 98,
+        ['odyssey_gemini_active'] = 100,
+        ['odyssey_mercury_vessel_active'] = 99,
+        ['odyssey_hopper_active'] = 66,
+    }
+
+    -- 1. Scan G.GAME for known Odyssey variables (Primary Source for Active Values)
+    for k, v in pairs(G.GAME) do
+        if type(k) == 'string' and k:find('odyssey_') then
+            local should_show = false
+            local name = k
+            local text = tostring(v)
+            local sort_priority = 0
+            local current_id = nil
+
+            -- Case A: Generic Spectral XMult (odyssey_spectral_ID_xmult)
+            local id_xmult = k:match("odyssey_spectral_(%d+)_xmult")
+            if id_xmult then
+                if type(v) == 'number' and v > 1 then
+                    should_show = true
+                    current_id = tonumber(id_xmult)
+                    name = localize('spectral_' .. id_xmult)
+                    text = localize{type='variable', key='k_active_spectral_'..id_xmult, vars={v}}
+                    sort_priority = 1
+                end
+            
+            -- Case B: Named Active Flags
+            elseif var_to_id[k] then
+                if v then
+                    should_show = true
+                    current_id = var_to_id[k]
+                    name = localize('spectral_' .. current_id)
+                    text = localize('k_active_spectral_' .. current_id)
+                    if text == 'ERROR' then text = "Active" end
+                    sort_priority = 2
+                end
+
+            -- Case C: Zero Absolute
+            elseif k == 'odyssey_zero_absolute' then
+                 if not G.GAME.odyssey_spectral_14_xmult and v then
+                      should_show = true
+                      current_id = 14
+                      name = localize('spectral_14')
+                      text = "Active"
+                 end
+            
+            -- Case D: Temporary Next Hand Effects
+            elseif k:find("_next_xmult") then
+                if v and v > 1 then
+                    should_show = true
+                    local id_next = k:match("odyssey_spectral_(%d+)_next_xmult")
+                    if id_next then
+                        current_id = tonumber(id_next)
+                        name = localize('spectral_' .. id_next)
+                        text = localize{type='variable', key='k_active_spectral_'..id_next, vars={v}} .. " (Next Hand)"
+                    else
+                        name = k:gsub("odyssey_", ""):gsub("_", " "):gsub("^%l", string.upper)
+                        text = "X" .. tostring(v) .. " (Next Hand)"
+                    end
+                end
+
+            -- Case E: Catch-all for other Odyssey variables
+            elseif v then
+                -- Hide 0s and falses
+                if (type(v) == 'number' and v ~= 0) or (type(v) == 'boolean' and v == true) or (type(v) == 'string') then
+                    should_show = true
+                    name = k:gsub("odyssey_", ""):gsub("_", " ")
+                    name = name:gsub("(%a)([%w_']*)", function(first, rest) return first:upper()..rest:lower() end)
+                    
+                    if type(v) == 'boolean' and v == true then
+                        text = localize('k_active') -- "Active"
+                    else
+                        text = tostring(v)
+                    end
+                    sort_priority = 99
+                end
+            end
+
+            if should_show then
+                 if current_id then displayed_ids[current_id] = true end
+                 table.insert(effects, { name = name, text = text, priority = sort_priority })
+            end
+        end
+    end
+
+    -- 2. Scan History for Used Spectrals (Fallback for "One-off" or missing effects)
+    if G.GAME.odyssey_history then
+        for id, used in pairs(G.GAME.odyssey_history) do
+            if used and not displayed_ids[id] then
+                -- If we haven't shown this ID yet (meaning it has no active variable being tracked above)
+                -- We show it as "Used" or try to find generic text
+                
+                local name = localize('spectral_' .. id)
+                if name == "ERROR" then name = "Spectral " .. id end
+                
+                -- Try to find specific active text, otherwise fallback
+                local text = localize('k_active_spectral_' .. id)
+                if text == "ERROR" then text = "Used" end
+
+                table.insert(effects, { name = name, text = text, priority = 3 })
+                displayed_ids[id] = true -- Mark as shown
+            end
+        end
+    end
+    
+    -- Sort by priority then name
+    table.sort(effects, function(a, b) 
+        if a.priority ~= b.priority then return a.priority < b.priority end
+        return a.name < b.name 
+    end)
+
+    return effects
+end
+
 -- Hook for global Odyssey mechanics (like per-hand Tarot buffs)
 SMODS.current_mod.calculate = function(self, context)
     if not context or type(context) ~= 'table' then return end
@@ -161,6 +291,13 @@ SMODS.current_mod.calculate = function(self, context)
         if G.GAME.odyssey_spectral_50_next_xmult then
             x_mult = x_mult * G.GAME.odyssey_spectral_50_next_xmult
             G.GAME.odyssey_spectral_50_next_xmult = nil -- Consume
+        end
+
+        -- Spectral: Hopper (66) 10% chance for X100 Mult
+        if G.GAME.odyssey_hopper_active then
+             if pseudorandom('hopper') < 0.1 then
+                 x_mult = x_mult * 100
+             end
         end
 
         -- Spectral: Yang (94) X1.5 for 5-card hands
