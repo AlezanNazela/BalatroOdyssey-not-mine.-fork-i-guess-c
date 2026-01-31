@@ -1,0 +1,191 @@
+[manifest]
+version = "1.0.0"
+priority = 0
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "for k, v in pairs(self.P_CENTERS) do"
+position = "after"
+payload = '''
+    -- SMODS Stability: Ensure vanilla editions have safe loc_vars for nil card instances (Deck Selection)
+    if k == 'e_foil' or k == 'e_holo' or k == 'e_polychrome' then
+        v.loc_vars = function(self, info_queue, card)
+            return { vars = { self.config.extra } }
+        end
+    elseif k == 'e_negative' then
+        v.loc_vars = function(self, info_queue, card) return { vars = {} } end
+    end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if not v.boss then"
+position = "at"
+payload = "if v.omit or not v.boss then"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "win_ante = 8,"
+position = "at"
+payload = "win_ante = 100,"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "self.P_CENTER_POOLS = {"
+position = "before"
+payload = '''
+    -- Balatro Odyssey: Permanent Vanilla Omission
+    -- This sets v.omit = true for all base game items we want to replace.
+    -- Done BEFORE pool population to ensure they are excluded.
+    for k, v in pairs(self.P_CENTERS) do
+        if not string.find(string.lower(k), "odyssey") then
+            local to_replace = {Joker = true, Tarot = true, Planet = true, Spectral = true, Voucher = true, Back = true}
+            if v.set and to_replace[v.set] then
+                v.omit = true
+            end
+        end
+    end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "if v.set == 'Joker' then table.insert(self.P_CENTER_POOLS['Joker'], v) end"
+position = "at"
+payload = "if v.set == 'Joker' and not v.omit then table.insert(self.P_CENTER_POOLS['Joker'], v) end"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "if v.set == 'Tarot' or v.set == 'Planet' then table.insert(self.P_CENTER_POOLS['Tarot_Planet'], v) end"
+position = "at"
+payload = "if (v.set == 'Tarot' or v.set == 'Planet') and not v.omit then table.insert(self.P_CENTER_POOLS['Tarot_Planet'], v) end"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "if v.consumeable then table.insert(self.P_CENTER_POOLS['Consumeables'], v) end"
+position = "at"
+payload = "if v.consumeable and not v.omit then table.insert(self.P_CENTER_POOLS['Consumeables'], v) end"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "table.sort(self.P_CENTER_POOLS[\"Joker\"], function (a, b) return a.order < b.order end)"
+position = "before"
+payload = '''
+    -- Balatro Odyssey: Nuclear Option (Final Pool Cleanup)
+    -- Removes any vanilla items that managed to sneak into the pools.
+    for pool_name, pool in pairs(self.P_CENTER_POOLS) do
+        local replace_sets = {Joker = true, Tarot = true, Planet = true, Spectral = true, Voucher = true, Back = true, Tarot_Planet = true, Consumeables = true}
+        if replace_sets[pool_name] then
+            for i = #pool, 1, -1 do
+                if pool[i].key and not string.find(string.lower(pool[i].key), "odyssey") then
+                    table.remove(pool, i)
+                end
+            end
+        end
+    end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "if v.rarity and v.set == 'Joker' and not v.demo then table.insert(self.P_JOKER_RARITY_POOLS[v.rarity], v) end"
+position = "at"
+payload = "if v.rarity and v.set == 'Joker' and not v.demo and not v.omit then table.insert(self.P_JOKER_RARITY_POOLS[v.rarity], v) end"
+match_indent = true
+
+[[patches]]
+[patches.regex]
+target = "game.lua"
+pattern = "card_limit\\s*=\\s*5,\\s*type\\s*=\\s*'play'"
+position = "at"
+payload = "card_limit = 10, type = 'play'"
+
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = "#G.hand.highlighted > 5"
+position = "at"
+payload = "#G.hand.highlighted > 10"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = "G.hand.config.card_limit <= 0"
+position = "at"
+payload = "true"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "G.shop_jokers.config.card_limit = G.GAME.shop.joker_max"
+position = "at"
+payload = "G.shop_jokers.config.card_limit = (G.GAME.blind and G.GAME.blind.key == 'blind_odyssey_blind_80') and 0 or G.GAME.shop.joker_max"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "for i = #G.shop_jokers.cards, G.GAME.shop.joker_max+1, -1 do"
+position = "at"
+payload = "for i = #G.shop_jokers.cards, ((G.GAME.blind and G.GAME.blind.key == 'blind_odyssey_blind_80') and 0 or G.GAME.shop.joker_max)+1, -1 do"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "for i = 1, G.GAME.shop.joker_max - #G.shop_jokers.cards do"
+position = "at"
+payload = "for i = 1, ((G.GAME.blind and G.GAME.blind.key == 'blind_odyssey_blind_80') and 0 or G.GAME.shop.joker_max) - #G.shop_jokers.cards do"
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "blind.lua"
+pattern = "function Blind:debuff_hand(cards, hand, handname, check)"
+position = "after"
+payload = '''
+    if self.config.blind and self.config.blind.debuff_hand and type(self.config.blind.debuff_hand) == 'function' then
+        if self.config.blind.debuff_hand(self, cards, hand, handname, check) then return true end
+    end
+'''
+match_indent = false
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "card_eval_status_text(G.jokers.cards[i], 'jokers', nil, percent, nil, effects.jokers)"
+position = "after"
+payload = '''
+            -- Odyssey: Joker on Joker effects (Quantum Field, Singularity, etc.)
+            for _, v in ipairs(G.jokers.cards) do
+                local _card = G.jokers.cards[i]
+                local effect = v:calculate_joker{full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_joker = _card}
+                if effect then
+                    local extras = {mult = false, hand_chips = false}
+                    if effect.mult_mod then mult = mod_mult(mult + effect.mult_mod);extras.mult = true end
+                    if effect.chip_mod then hand_chips = mod_chips(hand_chips + effect.chip_mod);extras.hand_chips = true end
+                    if (effect.Xmult_mod or effect.x_mult_mod) then mult = mod_mult(mult*(effect.Xmult_mod or effect.x_mult_mod));extras.mult = true  end
+                    if extras.mult or extras.hand_chips then update_hand_text({delay = 0}, {chips = extras.hand_chips and hand_chips, mult = extras.mult and mult}) end
+                    if extras.mult or extras.hand_chips then card_eval_status_text(v, 'jokers', nil, percent, nil, effect) end
+                    percent = percent+percent_delta
+                end
+            end
+'''
+match_indent = true
