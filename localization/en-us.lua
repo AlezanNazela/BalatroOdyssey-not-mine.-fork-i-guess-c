@@ -11160,8 +11160,8 @@ j_odyssey_j_professions_student = {
  ["b_odyssey_ghost"] = {
   name = "Ghost Deck",
   text = {
-   "Cartas jogadas não são",
-   "descartadas (voltam para hand).",
+   "Played cards are not",
+   "discarded (return to hand).",
    "-2 Hands."
   }
  },
@@ -11169,7 +11169,7 @@ j_odyssey_j_professions_student = {
  ["b_odyssey_vampire"] = {
   name = "Vampire Deck",
   text = {
-   "Destrói cards jogadas para",
+   "Destroys played cards to",
    "gain permanent Mult."
   }
  },
@@ -11178,7 +11178,7 @@ j_odyssey_j_professions_student = {
   name = "Zombie Deck",
   text = {
    "Can play discarded cards",
-   "(uma vez por round)."
+   "(once per round)."
   }
  },
 
@@ -11186,23 +11186,23 @@ j_odyssey_j_professions_student = {
   name = "Cyborg Deck",
   text = {
    "Starts with 2 Jokers 'Bot'",
-   "(Automatizados)."
+   "(Automated)."
   }
  },
 
  ["b_odyssey_alien"] = {
   name = "Alien Deck",
   text = {
-   "Naipes são substituídos por",
-   "símbolos alienígenas (4 novos",
-   "naipes)."
+   "Suits are replaced by",
+   "alien symbols (4 new",
+   "suits)."
   }
  },
 
  ["b_odyssey_mutant"] = {
   name = "Mutant Deck",
   text = {
-   "Naipes mudam a cada round."
+   "Suits change every round."
   }
  },
 
@@ -11215,15 +11215,15 @@ j_odyssey_j_professions_student = {
  },
 
  ["b_odyssey_invisible"] = {
-  name = "Invisível Deck",
+  name = "Invisible Deck",
   text = {
-   "Cartas são jogadas viradas",
+   "Cards are played face",
    "down. X4 Mult."
   }
  },
 
  ["b_odyssey_ethereal"] = {
-  name = "Etéreo Deck",
+  name = "Ethereal Deck",
   text = {
    "Spectral cards appear in the",
    "shop normally."
@@ -11239,11 +11239,11 @@ j_odyssey_j_professions_student = {
  },
 
  ["b_odyssey_magnetic"] = {
-  name = "Magnético Deck",
+  name = "Magnetic Deck",
   text = {
    "Cards of same rank attract",
-   "atraem (sempre compradas",
-   "juntas)."
+   "(always drawn",
+   "together)."
   }
  },
 
@@ -11256,10 +11256,10 @@ j_odyssey_j_professions_student = {
  },
 
  ["b_odyssey_volcanic"] = {
-  name = "Vulcânico Deck",
+  name = "Volcanic Deck",
   text = {
-   "Descarta hand inteira após",
-   "jogar. +$5 por hand."
+   "Discards entire hand after",
+   "playing. +$5 per hand."
   }
  },
 
@@ -11291,22 +11291,22 @@ j_odyssey_j_professions_student = {
   name = "Stellar Deck",
   text = {
    "Starts with 5 random",
-   "Planeta aleatórias."
+   "Planet cards."
   }
  },
 
  ["b_odyssey_mystic"] = {
-  name = "Místico Deck",
+  name = "Mystic Deck",
   text = {
-   "Starts with 5 random Tarô",
+   "Starts with 5 random Tarot",
    "cards."
   }
  },
 
  ["b_odyssey_tech"] = {
-  name = "Tecnológico Deck",
+  name = "Tech Deck",
   text = {
-   "Starts with $100. Shops são 2x",
+   "Starts with $100. Shops are 2x",
    "more expensive."
   }
  },
@@ -11322,43 +11322,43 @@ j_odyssey_j_professions_student = {
  ["b_odyssey_arcane"] = {
   name = "Arcane Deck",
   text = {
-   "Arcana Packs são free."
+   "Arcana Packs are free."
   }
  },
 
  ["b_odyssey_celestial"] = {
   name = "Celestial Deck",
   text = {
-   "Planet Packs são free."
+   "Planet Packs are free."
   }
  },
 
  ["b_odyssey_spectral"] = {
   name = "Spectral Deck",
   text = {
-   "Spectral Packs são free."
+   "Spectral Packs are free."
   }
  },
 
  ["b_odyssey_standard"] = {
   name = "Standard Deck",
   text = {
-   "Standard Packs são free."
+   "Standard Packs are free."
   }
  },
 
  ["b_odyssey_buffoon"] = {
   name = "Buffoon Deck",
   text = {
-   "Buffoon Packs são free."
+   "Buffoon Packs are free."
   }
  },
 
  ["b_odyssey_mercenary"] = {
-  name = "Mercenário Deck",
+  name = "Mercenary Deck",
   text = {
    "No money from blinds.",
-   "Earn $5 por Joker vendido."
+   "Earn $5 per Joker sold."
   }
  },
 
@@ -11384,7 +11384,7 @@ j_odyssey_j_professions_student = {
  },
 
  ["b_odyssey_chaotic_ii"] = {
-  name = "Caótico II Deck",
+  name = "Chaotic II Deck",
   text = {
    "Boss Blinds have double",
    "effects. X2 Score."
@@ -11411,7 +11411,7 @@ j_odyssey_j_professions_student = {
  ["b_odyssey_unlucky"] = {
   name = "Unlucky Deck",
   text = {
-   "Probabilidades são 1 em 1000.",
+   "Probabilities are 1 in 1000.",
    "Enemies 0.25x Score."
   }
  },
@@ -11427,8 +11427,8 @@ j_odyssey_j_professions_student = {
  ["b_odyssey_arthur"] = {
   name = "King Arthur Deck",
   text = {
-   "Starts with Excalibur (Joker",
-   "Lendário)."
+   "Starts with Excalibur (Legendary",
+   "Joker)."
   }
  },
 
@@ -11436,12 +11436,12 @@ j_odyssey_j_professions_student = {
   name = "Merlin Deck",
   text = {
    "Starts with 3 Potions",
-   "(Consumíveis)."
+   "(Consumables)."
   }
  },
 
  ["b_odyssey_dragon"] = {
-  name = "Dragão Deck",
+  name = "Dragon Deck",
   text = {
    "Bosses have 10x HP. You",
    "breathe fire (X10 Mult)."
@@ -11465,66 +11465,66 @@ j_odyssey_j_professions_student = {
   }
  },
 
- ["Chimera Deck"] = {
-  name = "Quimera Deck",
+ ["b_odyssey_chimera"] = {
+  name = "Chimera Deck",
   text = {
-   "4 different decks.",
-   "diferentes."
+   "Combines 4 different",
+   "deck effects."
   }
  },
 
- ["Griffin Deck"] = {
-  name = "Grifo Deck",
+ ["b_odyssey_griffin"] = {
+  name = "Griffin Deck",
   text = {
-   "(Skips automatically).",
-   "automaticamente)."
+   "Blinds are skipped",
+   "automatically."
   }
  },
 
- ["Unicorn Deck"] = {
-  name = "Unicórnio Deck",
+ ["b_odyssey_unicorn"] = {
+  name = "Unicorn Deck",
   text = {
-   "Starts with Joker 'Pureza'."
+   "Starts with Joker 'Purity'."
   }
  },
 
- ["Kraken Deck"] = {
+ ["b_odyssey_kraken"] = {
   name = "Kraken Deck",
   text = {
-   "Tentáculos (Jokers) te",
-   "agarram (Não pode vender",
-   "(Cards, Jokers)."
+   "Tentacles (Jokers) grab you",
+   "(Cannot sell Cards or",
+   "Jokers)."
   }
  },
 
  ["b_odyssey_leviathan"] = {
-  name = "5-card Hands give",
+  name = "Leviathan Deck",
   text = {
-   "Hands de 5 cards dão +1000",
+   "5-card Hands give +1000",
    "Chips."
   }
  },
 
  ["b_odyssey_behemoth"] = {
-  name = "1-card Hands give",
+  name = "Behemoth Deck",
   text = {
-   "Hands de 1 carta dão X5 Mult."
+   "1-card Hands give X5 Mult."
   }
  },
 
  ["b_odyssey_titan"] = {
-  name = "Titã Deck",
+  name = "Titan Deck",
   text = {
-   "{C:attention}2{} hand slots).",
-   "slots de hand)."
+    "Giant cards (occupy",
+    "{C:attention}2{} hand slots)."
   }
  },
 
  ["b_odyssey_gnome"] = {
-  name = "Gnomo Deck",
+  name = "Gnome Deck",
   text = {
-   "{C:attention}0.5{} hand slots).",
-   "slots)."
+    "Tiny cards (occupy",
+    "{C:attention}0.5{} hand slots)."
   }
  },
 
