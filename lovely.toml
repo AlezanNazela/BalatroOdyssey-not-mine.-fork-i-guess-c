@@ -189,4 +189,46 @@ payload = '''
                 end
             end
 '''
+
 match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "for i = 1, #G.jokers.cards do"
+position = "before"
+payload = '''
+    -- Balatro Odyssey: Lunar Deck Global Logic (Triggered in Scoring)
+    -- print("DEBUG: LOVELY GLOBAL PATCH EXECUTING") 
+    if G.GAME.selected_back and G.GAME.selected_back.effect.center.key == 'lunar' then
+        print("DEBUG: LOVELY GLOBAL PATCH - LUNAR DECK DETECTED")
+        local phase, cycle = get_odyssey_lunar_phase()
+        print("DEBUG: Lovely Patch Global Phase: " .. tostring(phase) .. " Cycle: " .. tostring(cycle))
+        
+        if phase == 5 then -- Eclipse
+            print("DEBUG: Applying Eclipse X5")
+            mult = mod_mult(mult * 5)
+            update_hand_text({delay = 0}, {mult = mult, status_text = true})
+            card_eval_status_text(G.deck, 'jokers', nil, percent, nil, {message = "Eclipse! X5", Xmult_mod = 5, colour = G.C.PURPLE})
+        elseif phase == 3 then -- Full Moon
+            local xmult = 2 + ((cycle-1)*0.5)
+            print("DEBUG: Applying Full Moon X" .. tostring(xmult))
+            mult = mod_mult(mult * xmult)
+            update_hand_text({delay = 0}, {mult = mult, status_text = true})
+            card_eval_status_text(G.deck, 'jokers', nil, percent, nil, {message = "Full Moon X"..xmult, Xmult_mod = xmult, colour = G.C.YELLOW})
+        elseif phase == 1 then -- New Moon
+             local mod = 1
+             if cycle == 1 then mod = 0.75
+             elseif cycle == 2 then mod = 0.7
+             elseif cycle == 3 then mod = 0.65
+             else mod = 0.55 end
+             print("DEBUG: Applying New Moon X" .. tostring(mod))
+             mult = mod_mult(mult * mod)
+             update_hand_text({delay = 0}, {mult = mult, status_text = true})
+             card_eval_status_text(G.deck, 'jokers', nil, percent, nil, {message = "New Moon X"..mod, Xmult_mod = mod, colour = G.C.BLACK})
+        end
+    end
+'''
+match_indent = true
+
+

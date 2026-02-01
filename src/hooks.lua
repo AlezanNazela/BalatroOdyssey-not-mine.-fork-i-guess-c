@@ -1347,3 +1347,540 @@ G.UIDEF.run_info = function()
     tab_h = 8,
     snap_to_nav = true})}})
 end
+
+------------------------------------------------------------------------
+-- MAGNETIC DECK: Clustered Shuffle
+------------------------------------------------------------------------
+local old_shuffle = CardArea.shuffle
+function CardArea:shuffle(type, rng)
+    local deck_key = get_deck_key()
+    if self == G.deck and deck_key == 'magnetic' then
+        -- 1. Group cards by rank
+        local ranks = {}
+        for _, card in ipairs(self.cards) do
+            local rank = card.base.value -- '2', '3', 'T', 'K', etc.
+            if not ranks[rank] then ranks[rank] = {} end
+            table.insert(ranks[rank], card)
+        end
+        
+        -- 2. Scramble the list of ranks or sorting keys
+        local rank_keys = {}
+        for k, v in pairs(ranks) do
+            table.insert(rank_keys, k)
+        end
+        pseudoshuffle(rank_keys, pseudoseed('magnetic_deck'))
+        
+        -- 3. Rebuild deck
+        self.cards = {}
+        for _, rank in ipairs(rank_keys) do
+            local rank_group = ranks[rank]
+            -- Shuffle within the rank group (so suits aren't always in same order)
+            pseudoshuffle(rank_group, pseudoseed('magnetic_rank'))
+            
+            for _, card in ipairs(rank_group) do
+                table.insert(self.cards, card)
+            end
+        end
+        
+        -- Override implies we don't call original shuffle
+        return
+    end
+    
+    return old_shuffle(self, type, rng)
+end
+
+------------------------------------------------------------------------
+-- LUNAR DECK: Moon Phases
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+-- LUNAR DECK: Moon Phases
+------------------------------------------------------------------------
+-- Helper to get current phase (1-4) and evolution cycle
+
+
+-- Visual Effects for Lunar Deck
+-- Visual Effects for Lunar Deck via Dynamic Editions
+-- Apply editions to cards based on current phase
+
+-- Helper function to apply Lunar edition to a card
+local function apply_lunar_edition(card, edition_key)
+    if not card or not card.set_edition then 
+        print("DEBUG: apply_lunar_edition - card or set_edition is nil")
+        return 
+    end
+    
+    -- Don't override existing special editions (Negative, Polychrome, etc.)
+    if card.edition and (card.edition.negative or card.edition.polychrome or card.edition.holo or card.edition.foil) then
+        print("DEBUG: Skipping card with special edition: " .. tostring(card.edition))
+        return
+    end
+    
+    -- Apply the lunar edition
+    if edition_key then
+        print("DEBUG: Applying edition '" .. edition_key .. "' to card")
+        card:set_edition({[edition_key] = true}, true, true)
+    else
+        -- Remove lunar editions if nil is passed
+        if card.edition and (card.edition.odyssey_lunar_green or card.edition.odyssey_lunar_red or card.edition.odyssey_lunar_eclipse) then
+            print("DEBUG: Removing lunar edition from card")
+            card:set_edition(nil, true, true)
+        end
+    end
+end
+
+-- Hook into round start to apply editions
+local old_game_start_round = Game.start_round
+Game.start_round = function(self)
+    print("DEBUG: Game.start_round called!")
+    local ret = old_game_start_round(self)
+    
+    local key = get_deck_key()
+    print("DEBUG: Deck key in start_round: " .. tostring(key))
+    
+    if key == 'lunar' then
+        local phase, cycle = get_odyssey_lunar_phase()
+        local edition_key = nil
+        
+        -- Determine which edition to apply (using correct keys without cry_ prefix)
+        if phase == 1 or phase == 2 then
+            edition_key = 'odyssey_lunar_green'
+        elseif phase == 3 or phase == 4 then
+            edition_key = 'odyssey_lunar_red'
+        elseif phase == 5 then
+            edition_key = 'odyssey_lunar_eclipse'
+        end
+        
+        print("DEBUG: Applying Lunar editions. Phase: " .. phase .. " Edition: " .. tostring(edition_key))
+        
+        -- Apply to all cards in hand
+        if G.hand and G.hand.cards then
+            print("DEBUG: Applying to " .. #G.hand.cards .. " cards in hand")
+            for i = 1, #G.hand.cards do
+                apply_lunar_edition(G.hand.cards[i], edition_key)
+            end
+        else
+            print("DEBUG: G.hand or G.hand.cards is nil!")
+        end
+        
+        -- Apply to all cards in deck
+        if G.deck and G.deck.cards then
+            print("DEBUG: Applying to " .. #G.deck.cards .. " cards in deck")
+            for i = 1, #G.deck.cards do
+                apply_lunar_edition(G.deck.cards[i], edition_key)
+            end
+        else
+            print("DEBUG: G.deck or G.deck.cards is nil!")
+        end
+    end
+    
+    return ret
+end
+
+-- Editions are applied once per round at round start (see Game:update hook)
+-- No mid-round edition changes for stability
+
+
+
+-- Hook Card:get_chip_mult (Waxing/Waning/Eclipse Mult Bonuses)
+local old_get_chip_mult = Card.get_chip_mult or function(self) return 0 end
+Card.get_chip_mult = function(self)
+    local ret = old_get_chip_mult(self)
+    
+     local key = get_deck_key()
+     if key == 'lunar' then
+        local phase, cycle = get_odyssey_lunar_phase()
+        cycle = tonumber(cycle) or 1 -- Ensure number
+        
+        -- Phase 1: New Moon (Mult Malus)
+        -- Applies to any bonus mult (e.g. Empress, Holographic) on the card
+        if phase == 1 then
+             local mod = 1
+             if cycle == 1 then mod = 0.75
+             elseif cycle == 2 then mod = 0.7
+             elseif cycle == 3 then mod = 0.65
+             else mod = 0.55 end
+             
+             -- Logic: NewMult = OldMult * Mod
+             if ret > 0 then
+                 ret = ret * mod
+             end
+        end
+        
+        -- Phase 2: Waxing (Black Cards)
+        if phase == 2 and (self:is_suit("Clubs") or self:is_suit("Spades")) then
+            local bonus = 2
+            if cycle == 1 then bonus = 2
+            elseif cycle == 2 then bonus = 5
+            elseif cycle == 3 then bonus = 10
+            else bonus = 5*(cycle-1) end
+            
+            print("DEBUG: Waxing Mult Bonus: " .. tostring(bonus))
+            ret = ret + bonus
+        end
+        
+        -- Phase 4: Waning (Red Cards)
+        if phase == 4 and (self:is_suit("Hearts") or self:is_suit("Diamonds")) then
+            local bonus = 2
+            if cycle == 1 then bonus = 2
+            elseif cycle == 2 then bonus = 5
+            elseif cycle == 3 then bonus = 10
+            else bonus = 5*(cycle-1) end
+             
+            print("DEBUG: Waning Mult Bonus: " .. tostring(bonus))
+            ret = ret + bonus
+        end
+        
+        -- Phase 5: Eclipse (All Cards +20 Mult)
+        if phase == 5 then
+            print("DEBUG: Eclipse Mult Bonus: 20")
+            ret = ret + 20
+        end
+    end
+    return ret
+end
+
+
+-- Hook Back:apply_to_run to log selection
+local old_apply_to_run = Back.apply_to_run or function() end
+Back.apply_to_run = function(self)
+    print("DEBUG: Back:apply_to_run called")
+    if self.effect.center.key then
+        print("DEBUG: Selected Deck Key: " .. tostring(self.effect.center.key))
+        if self.effect.config then
+            print("DEBUG: Deck Config found")
+        end
+    end
+    old_apply_to_run(self)
+end
+
+-- Hook Game:update to track round changes
+local old_game_update = Game.update or function() end
+Game.update = function(self, dt)
+    old_game_update(self, dt)
+    -- Only run logic if not in menu and game exists
+    if G.GAME and G.GAME.round and G.GAME.round ~= G.ODYSSEY_LAST_ROUND and G.STATE ~= G.STATES.MENU then
+        print("DEBUG: Round Changed! Old: " .. tostring(G.ODYSSEY_LAST_ROUND) .. " New: " .. tostring(G.GAME.round))
+        G.ODYSSEY_LAST_ROUND = G.GAME.round
+        G.ODYSSEY_DEBUG_DRAW_THROTTLED = false -- Reset throttle so we see logs again
+        
+        -- One-time Deck Check
+        local debug_key = get_deck_key()
+        print("DEBUG: Game:update Round Change. Deck Key Resolution: " .. tostring(debug_key))
+        if G.GAME.selected_back then
+            print("DEBUG: G.GAME.selected_back Exists. Key raw: " .. tostring(G.GAME.selected_back.effect.center.key))
+        else
+            print("DEBUG: G.GAME.selected_back IS NIL!")
+        end
+
+        -- Trigger Lunar Phase Logic HERE since start_round is unreliable
+        local key = get_deck_key()
+        if key == 'lunar' then
+            print("DEBUG: Game:update TRIGGERING LUNAR PHASE LOGIC")
+            local phase, evolution = get_odyssey_lunar_phase()
+            
+            -- Apply Lunar Editions to all cards
+            local edition_key = nil
+            if phase == 5 then
+                edition_key = 'odyssey_lunar_eclipse'
+            else
+                -- Build edition key: odyssey_lunar_p{phase}e{evolution}
+                edition_key = 'odyssey_lunar_p' .. phase .. 'e' .. evolution
+            end
+            
+            print("DEBUG: Applying editions. Phase: " .. phase .. " Evolution: " .. evolution .. " Edition: " .. tostring(edition_key))
+            
+            
+            -- Store current phase/evolution globally for tooltip access
+            if not G.GAME.odyssey_lunar_state then
+                G.GAME.odyssey_lunar_state = {}
+            end
+            G.GAME.odyssey_lunar_state.phase = phase
+            G.GAME.odyssey_lunar_state.evolution = evolution
+            
+            -- Apply to all cards in deck (only if they don't have a non-Lunar edition)
+            if G.playing_cards then
+                print("DEBUG: Found G.playing_cards, applying to " .. #G.playing_cards .. " cards")
+                for i = 1, #G.playing_cards do
+                    local card = G.playing_cards[i]
+                    -- Only apply if card has no edition, or already has a Lunar edition
+                    if not card.edition or has_lunar_edition(card) then
+                        apply_lunar_edition(card, edition_key)
+                    end
+                end
+            else
+                print("DEBUG: G.playing_cards is nil!")
+            end
+            
+            local phase_names = {
+                "New Moon",
+                "Waxing Moon",
+                "Full Moon",
+                "Waning Moon",
+                "THE ECLIPSE"
+            }
+            
+            local phase_name = phase_names[phase]
+            local subtext = ""
+            
+            -- Evolution-based subtexts
+            if phase == 5 then
+                subtext = "ALL Cards: +15 Chips, +15 Mult, X4 Mult"
+            elseif phase == 1 then
+                -- Phase 1: Black Cards with Debuff
+                if evolution == 0 then subtext = "0.75x Debuff"
+                elseif evolution == 1 then subtext = "0.70x | Black Immune"
+                elseif evolution == 2 then subtext = "0.65x | Black +Mult"
+                else subtext = "0.60x | Black +Mult+Chips" end
+            elseif phase == 2 then
+                -- Phase 2: Neutral (All Cards) Mult
+                if evolution == 0 then subtext = "ALL +2 Mult"
+                elseif evolution == 1 then subtext = "ALL +4 Mult"
+                elseif evolution == 2 then subtext = "ALL +6 Mult"
+                else subtext = "ALL +9 Mult" end
+            elseif phase == 3 then
+                -- Phase 3: XMult
+                if evolution == 0 then subtext = "X1.5 Mult"
+                elseif evolution == 1 then subtext = "X2 Mult"
+                elseif evolution == 2 then subtext = "X2.25 Mult"
+                else subtext = "X2.5 Mult" end
+            elseif phase == 4 then
+                -- Phase 4: Red Cards with Debuff
+                if evolution == 0 then subtext = "0.75x Debuff"
+                elseif evolution == 1 then subtext = "0.70x | Red Immune"
+                elseif evolution == 2 then subtext = "0.65x | Red +Mult"
+                else subtext = "0.60x | Red +Mult+Chips" end
+            end
+
+            attention_text({
+                text = phase_name .. (phase == 5 and "" or " (Evo " .. evolution .. ")"),
+                scale = phase == 5 and 1.2 or 0.8, 
+                hold = 3,
+                colour = phase == 5 and G.C.PURPLE or G.C.WHITE
+            })
+
+            G.E_MANAGER:add_event(Event({
+                trigger = 'after',
+                delay = 3.0,
+                func = function() 
+                    attention_text({
+                        text = subtext,
+                        scale = 0.6, 
+                        hold = 2,
+                        colour = G.C.GOLD
+                    })
+                    return true
+                end
+            }))
+        end
+    end
+end
+
+print("DEBUG: src/hooks.lua loaded successfully")
+
+-- Hook Card:get_chip_bonus (Phase 1: Black Card Bonuses with Debuff)
+local old_get_chip_bonus = Card.get_chip_bonus or function(self)
+    if self.ability and self.ability.bonus then return self.ability.bonus + (self.ability.perma_bonus or 0) end
+    return 0
+end
+
+-- Helper function to check if card has any Lunar edition
+local function has_lunar_edition(card)
+    if not card.edition then return false end
+    -- Check if any edition key starts with "odyssey_lunar"
+    for k, v in pairs(card.edition) do
+        if type(k) == "string" and k:match("^odyssey_lunar") and v then
+            return true
+        end
+    end
+    return false
+end
+
+Card.get_chip_bonus = function(self)
+    local ret = old_get_chip_bonus(self)
+    
+    local key = get_deck_key()
+    if key == 'lunar' then
+        -- Only apply to cards with Lunar edition
+        if not has_lunar_edition(self) then
+            return ret
+        end
+        
+        local phase, evolution = get_odyssey_lunar_phase()
+        
+        -- Phase 1: New Moon (Black Cards - Debuff with Immunity/Bonuses)
+        if phase == 1 then
+            local is_black = self:is_suit("Clubs") or self:is_suit("Spades")
+            
+            -- Debuff multipliers by evolution
+            local debuff_mult = 0.75
+            if evolution == 1 then debuff_mult = 0.70
+            elseif evolution == 2 then debuff_mult = 0.65
+            elseif evolution >= 3 then debuff_mult = 0.60 end
+            
+            -- Apply debuff to non-immune cards
+            if not is_black or evolution == 0 then
+                if ret > 0 then
+                    ret = ret * debuff_mult
+                end
+            end
+            
+            -- Black card chip bonuses at higher evolutions
+            if is_black and evolution >= 2 then
+                local chip_bonus = evolution == 2 and 5 or 10
+                ret = ret + chip_bonus
+            end
+        end
+        
+        -- Phase 4: Waning Moon (Red Cards - Debuff with Immunity/Bonuses)
+        if phase == 4 then
+            local is_red = self:is_suit("Hearts") or self:is_suit("Diamonds")
+            
+            -- Debuff multipliers by evolution
+            local debuff_mult = 0.75
+            if evolution == 1 then debuff_mult = 0.70
+            elseif evolution == 2 then debuff_mult = 0.65
+            elseif evolution >= 3 then debuff_mult = 0.60 end
+            
+            -- Apply debuff to non-immune cards
+            if not is_red or evolution == 0 then
+                if ret > 0 then
+                    ret = ret * debuff_mult
+                end
+            end
+            
+            -- Red card chip bonuses at higher evolutions
+            if is_red and evolution >= 2 then
+                local chip_bonus = evolution == 2 and 5 or 10
+                ret = ret + chip_bonus
+            end
+        end
+    end
+    return ret
+end
+
+-- Hook Card:get_chip_mult (All Phases: Evolution-Based Mult Bonuses)
+local old_get_chip_mult = Card.get_chip_mult or function(self) return 0 end
+Card.get_chip_mult = function(self)
+    local ret = old_get_chip_mult(self)
+    
+    local key = get_deck_key()
+    if key == 'lunar' then
+        -- Only apply to cards with Lunar edition
+        if not has_lunar_edition(self) then
+            return ret
+        end
+        
+        local phase, evolution = get_odyssey_lunar_phase()
+        local is_black = self:is_suit("Clubs") or self:is_suit("Spades")
+        local is_red = self:is_suit("Hearts") or self:is_suit("Diamonds")
+        
+        -- Phase 1: New Moon (Black Cards - Debuff with Immunity/Bonuses)
+        if phase == 1 then
+            -- Debuff multipliers by evolution
+            local debuff_mult = 0.75
+            if evolution == 1 then debuff_mult = 0.70
+            elseif evolution == 2 then debuff_mult = 0.65
+            elseif evolution >= 3 then debuff_mult = 0.60 end
+            
+            -- Apply debuff to non-immune cards
+            if not is_black or evolution == 0 then
+                if ret > 0 then
+                    ret = ret * debuff_mult
+                end
+            end
+            
+            -- Black card Mult bonuses at higher evolutions
+            if is_black and evolution >= 2 then
+                local mult_bonus = evolution == 2 and 5 or 10
+                ret = ret + mult_bonus
+            end
+        end
+        
+        -- Phase 2: Waxing Moon (Neutral - ALL Cards Mult)
+        if phase == 2 then
+            -- Base neutral values: 2, 4, 6, 9
+            local bonus = 2 -- Evo 0
+            if evolution == 1 then bonus = 4
+            elseif evolution == 2 then bonus = 6
+            elseif evolution >= 3 then bonus = 9 end
+            
+            ret = ret + bonus
+        end
+        
+        -- Phase 3: Full Moon (All Cards XMult)
+        -- Note: XMult is handled separately in Card.calculate_joker
+        
+        -- Phase 4: Waning Moon (Red Cards - Debuff with Immunity/Bonuses)
+        if phase == 4 then
+            -- Debuff multipliers by evolution
+            local debuff_mult = 0.75
+            if evolution == 1 then debuff_mult = 0.70
+            elseif evolution == 2 then debuff_mult = 0.65
+            elseif evolution >= 3 then debuff_mult = 0.60 end
+            
+            -- Apply debuff to non-immune cards
+            if not is_red or evolution == 0 then
+                if ret > 0 then
+                    ret = ret * debuff_mult
+                end
+            end
+            
+            -- Red card Mult bonuses at higher evolutions
+            if is_red and evolution >= 2 then
+                local mult_bonus = evolution == 2 and 5 or 10
+                ret = ret + mult_bonus
+            end
+        end
+        
+        -- Phase 5: Eclipse (All Cards +15 Mult)
+        if phase == 5 then
+            ret = ret + 15
+        end
+    end
+    return ret
+end
+
+-- Phase 3: Full Moon XMult & Phase 5: Eclipse Chip Bonus
+-- These are applied during individual card scoring
+local old_eval_card = Card.calculate_joker
+Card.calculate_joker = function(self, context)
+    local ret = old_eval_card and old_eval_card(self, context) or nil
+    
+    -- Apply Phase 3 XMult and Eclipse Chips during scoring
+    if context.cardarea == G.play and context.individual and not context.repetition and not context.other_card then
+        local key = get_deck_key()
+        if key == 'lunar' then
+            -- Only apply to cards with Lunar edition
+            if self.edition and (self.edition.odyssey_lunar_green or self.edition.odyssey_lunar_red or self.edition.odyssey_lunar_eclipse) then
+                local phase, evolution = get_odyssey_lunar_phase()
+                
+                -- Phase 3: Full Moon (XMult for all Lunar cards)
+                if phase == 3 then
+                    local xmult = 1.5 -- Evo 0
+                    if evolution == 1 then xmult = 2
+                    elseif evolution == 2 then xmult = 2.25
+                    elseif evolution >= 3 then xmult = 2.5 end
+                    
+                    return {
+                        message = "X" .. tostring(xmult),
+                        Xmult_mod = xmult,
+                        colour = G.C.PURPLE
+                    }
+                end
+                
+                -- Phase 5: Eclipse (+15 Chips AND X4 Mult)
+                if phase == 5 then
+                    return {
+                        message = "Eclipse!",
+                        chips = 15,
+                        Xmult_mod = 4,
+                        colour = G.C.DARK_EDITION
+                    }
+                end
+            end
+        end
+    end
+    
+    return ret
+end

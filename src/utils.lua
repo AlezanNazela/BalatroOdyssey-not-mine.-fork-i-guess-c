@@ -1,6 +1,30 @@
 -- UTILITY FUNCTIONS
 ----------------------------------------------
 
+-- Lunar Deck Phase & Evolution Tracking
+-- Phases cycle 1-4 every 4 rounds
+-- Evolution increases every 4 rounds (after completing all 4 phases)
+-- Eclipse starts at round 17
+function get_odyssey_lunar_phase()
+    if not G.GAME or not G.GAME.round then 
+        return 1, 0 
+    end
+    
+    local round = G.GAME.round
+    
+    -- Eclipse starts at round 17 (after 4 full cycles of 4 phases)
+    if round >= 17 then
+        return 5, 0 -- Eclipse, no evolution levels
+    end
+    
+    -- Phase cycles 1-4 every 4 rounds
+    -- Round 1=Phase1, R2=Phase2, R3=Phase3, R4=Phase4, R5=Phase1(Evo1), etc
+    local phase = ((round - 1) % 4) + 1  -- Cycles 1,2,3,4,1,2,3,4...
+    local evolution = math.floor((round - 1) / 4)  -- 0 for rounds 1-4, 1 for 5-8, 2 for 9-12, 3 for 13-16
+    
+    return phase, evolution
+end
+
 -- Helper: Count total number of Jokers
 function count_jokers()
     return #G.jokers.cards
@@ -936,16 +960,30 @@ sendDebugMessage("Balatro Odyssey: UI Overrides Loaded (Number Formatting + Deck
 local deck_mechanics = {}
 
 -- Helper to get current deck key
+-- Helper to get current deck key
 function get_deck_key()
-    if G.GAME and G.GAME.selected_back then
-        local key = G.GAME.selected_back.effect.center.key
-        if not key then return nil end
-        -- Handle Steamodded b_odyssey_ format and odyssey_ format
-        key = key:gsub("^b_odyssey_", "")
-        key = key:gsub("^odyssey_", "")
-        return key
+    if not G then return nil end
+    if not G.GAME then return nil end
+    if not G.GAME.selected_back then 
+        -- print("DEBUG: get_deck_key - G.GAME.selected_back is nil")
+        return nil 
     end
-    return nil
+    if not G.GAME.selected_back.effect then return nil end
+    if not G.GAME.selected_back.effect.center then return nil end
+
+    local key = G.GAME.selected_back.effect.center.key
+    -- Debugging: Print the actual key
+    -- print("DEBUG DECK KEY:", key) 
+    
+    if not key then return nil end
+    
+    -- Handle Steamodded varying formats
+    key = key:gsub("^b_odyssey_", "")
+    key = key:gsub("^odyssey_", "")
+    key = key:gsub("^BalatroOdyssey_", "")
+    -- Fallback: if key is b_lunar (atlas name leak?) or similar
+    key = key:gsub("^b_", "") 
+    return key
 end
 
 -- Helper to get deck config

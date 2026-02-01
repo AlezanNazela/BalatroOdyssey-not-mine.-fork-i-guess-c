@@ -865,13 +865,7 @@ SMODS.Back({
     config = {}
 })
 
--- 63. Baralho Baralho Magnético
-SMODS.Back({
-    key = 'magnetic',
-    atlas = 'b_magnetic',
-    pos = { x = 0, y = 0 },
-    config = {}
-})
+
 
 -- 64. Baralho Baralho Congelado
 SMODS.Back({
@@ -938,7 +932,7 @@ SMODS.Back({
     key = 'lunar',
     atlas = 'b_lunar',
     pos = { x = 0, y = 0 },
-    config = {}
+    config = { odyssey_lunar = true }
 })
 
 -- 69. Baralho Baralho Estelar
@@ -1366,3 +1360,12 @@ function Game:load_run(args)
 end
 
 
+
+-- 41. Magnetic Deck
+SMODS.Back({
+    name = "Magnetic Deck",
+    key = "magnetic",
+    atlas = "b_magnetic",
+    pos = { x = 0, y = 0 },
+    config = { odyssey_magnetic = true },
+})
