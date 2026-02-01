@@ -19,9 +19,18 @@ SMODS.Edition({
     loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:green}Waxing Moon{} (Evo 0)", "{C:mult}ALL{} cards {C:mult}+2{} Mult"}}
 })
 SMODS.Edition({
-    key = 'odyssey_lunar_p3e0', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, config = {},
+    key = 'odyssey_lunar_p3e0', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, 
+    config = { x_mult = 1.5 },
     sound = {sound = 'generic1', per = 1, vol = 0.3},
-    loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:red}Full Moon{} (Evo 0)", "{C:mult}ALL{} cards {X:mult,C:white}X1.5{} Mult"}}
+    loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:red}Full Moon{} (Evo 0)", "{C:mult}ALL{} cards {X:mult,C:white}X1.5{} Mult"}},
+    calculate = function(self, card, context)
+        if context.main_scoring then
+            return {
+                x_mult = self.config.x_mult,
+                card = card
+            }
+        end
+    end
 })
 SMODS.Edition({
     key = 'odyssey_lunar_p4e0', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, config = {},
@@ -41,9 +50,18 @@ SMODS.Edition({
     loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:green}Waxing Moon{} (Evo 1)", "{C:mult}ALL{} cards {C:mult}+4{} Mult"}}
 })
 SMODS.Edition({
-    key = 'odyssey_lunar_p3e1', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, config = {},
+    key = 'odyssey_lunar_p3e1', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, 
+    config = { x_mult = 2 },
     sound = {sound = 'generic1', per = 1, vol = 0.3},
-    loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:red}Full Moon{} (Evo 1)", "{C:mult}ALL{} cards {X:mult,C:white}X2{} Mult"}}
+    loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:red}Full Moon{} (Evo 1)", "{C:mult}ALL{} cards {X:mult,C:white}X2{} Mult"}},
+    calculate = function(self, card, context)
+        if context.main_scoring then
+            return {
+                x_mult = self.config.x_mult,
+                card = card
+            }
+        end
+    end
 })
 SMODS.Edition({
     key = 'odyssey_lunar_p4e1', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, config = {},
@@ -63,9 +81,18 @@ SMODS.Edition({
     loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:green}Waxing Moon{} (Evo 2)", "{C:mult}ALL{} cards {C:mult}+6{} Mult"}}
 })
 SMODS.Edition({
-    key = 'odyssey_lunar_p3e2', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, config = {},
+    key = 'odyssey_lunar_p3e2', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, 
+    config = { x_mult = 2.25 },
     sound = {sound = 'generic1', per = 1, vol = 0.3},
-    loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:red}Full Moon{} (Evo 2)", "{C:mult}ALL{} cards {X:mult,C:white}X2.25{} Mult"}}
+    loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:red}Full Moon{} (Evo 2)", "{C:mult}ALL{} cards {X:mult,C:white}X2.25{} Mult"}},
+    calculate = function(self, card, context)
+        if context.main_scoring then
+            return {
+                x_mult = self.config.x_mult,
+                card = card
+            }
+        end
+    end
 })
 SMODS.Edition({
     key = 'odyssey_lunar_p4e2', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, config = {},
@@ -85,9 +112,18 @@ SMODS.Edition({
     loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:green}Waxing Moon{} (Evo 3)", "{C:mult}ALL{} cards {C:mult}+9{} Mult"}}
 })
 SMODS.Edition({
-    key = 'odyssey_lunar_p3e3', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, config = {},
+    key = 'odyssey_lunar_p3e3', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, 
+    config = { x_mult = 2.5 },
     sound = {sound = 'generic1', per = 1, vol = 0.3},
-    loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:red}Full Moon{} (Evo 3)", "{C:mult}ALL{} cards {X:mult,C:white}X2.5{} Mult"}}
+    loc_txt = {name = "Lunar", label = "Lunar", text = {"{C:red}Full Moon{} (Evo 3)", "{C:mult}ALL{} cards {X:mult,C:white}X2.5{} Mult"}},
+    calculate = function(self, card, context)
+        if context.main_scoring then
+            return {
+                x_mult = self.config.x_mult,
+                card = card
+            }
+        end
+    end
 })
 SMODS.Edition({
     key = 'odyssey_lunar_p4e3', shader = 'lunar_red', in_shop = false, weight = 0, extra_cost = 0, config = {},
@@ -97,9 +133,23 @@ SMODS.Edition({
 
 -- ECLIPSE (Round 17+)
 SMODS.Edition({
-    key = 'odyssey_lunar_eclipse', shader = 'lunar_eclipse', in_shop = false, weight = 0, extra_cost = 0, config = {},
+    key = 'odyssey_lunar_eclipse', shader = 'lunar_eclipse', in_shop = false, weight = 0, extra_cost = 0, 
+    config = { x_mult = 4, x_chips = 4, mult = 15, chips = 15 },
     sound = {sound = 'generic1', per = 1, vol = 0.3},
-    loc_txt = {name = "Eclipse", label = "Eclipse", text = {"{C:dark_edition}THE ECLIPSE", "{C:chips}+15{} Chips, {C:mult}+15{} Mult, {X:mult,C:white}X4{} Mult"}}
+    loc_txt = {name = "Eclipse", label = "Eclipse", text = {"{C:dark_edition}THE ECLIPSE", "{C:chips}+15{} Chips, {C:mult}+15{} Mult, {X:mult,C:white}X4{} Mult"}},
+    calculate = function(self, card, context)
+        if context.main_scoring then
+            return {
+                x_mult = self.config.x_mult,
+                x_chips = self.config.x_chips,
+                mult = self.config.mult,
+                chips = self.config.chips,
+                message = "ECLIPSE!",
+                colour = G.C.DARK_EDITION,
+                card = card
+            }
+        end
+    end
 })
 
 

@@ -1467,19 +1467,36 @@ Game.start_round = function(self)
     
     if key == 'lunar' then
         local phase, cycle = get_odyssey_lunar_phase()
+        local evolution = tonumber(cycle) or 0
         local edition_key = nil
         
-        -- Determine which edition to apply (using correct keys without cry_ prefix)
-        if phase == 1 or phase == 2 then
-            edition_key = 'odyssey_lunar_green'
-        elseif phase == 3 or phase == 4 then
-            edition_key = 'odyssey_lunar_red'
-        elseif phase == 5 then
-            edition_key = 'odyssey_lunar_eclipse'
+        -- Determine which edition to apply (using evolving keys)
+        if phase == 5 then
+             edition_key = 'odyssey_lunar_eclipse'
+        else
+             edition_key = 'odyssey_lunar_p' .. phase .. 'e' .. evolution
         end
         
-        print("DEBUG: Applying Lunar editions. Phase: " .. phase .. " Edition: " .. tostring(edition_key))
+        print("DEBUG: Applying Lunar editions. Phase: " .. phase .. " Evo: " .. evolution .. " Key: " .. tostring(edition_key))
         
+        local function apply_lunar_edition(card, key)
+            if not card then return end
+            -- Avoid redundant application
+            if card.edition and card.edition[key] then return end
+            
+            -- Don't override existing special editions unless it's a previous lunar edition
+            local has_other_special = false
+            if card.edition then
+                if card.edition.negative or card.edition.polychrome or card.edition.holo or card.edition.foil then
+                   has_other_special = true
+                end
+            end
+            
+            if not has_other_special then
+                card:set_edition(key, true, true)
+            end
+        end
+
         -- Apply to all cards in hand
         if G.hand and G.hand.cards then
             print("DEBUG: Applying to " .. #G.hand.cards .. " cards in hand")
@@ -1940,43 +1957,5 @@ Card.get_chip_mult = function(self)
 end
 
 -- Re-Add Card.calculate_joker for XMult (Phase 3 & 5) Visuals
-local old_eval_card = Card.calculate_joker
-Card.calculate_joker = function(self, context)
-    local ret = old_eval_card and old_eval_card(self, context) or nil
-    
-    -- Apply Phase 3 XMult and Phase 5 XMult/Chips during individual scoring
-    if context.cardarea == G.play and context.individual and not context.repetition and not context.other_card then
-        local key = get_deck_key()
-        if key == 'lunar' then
-            if has_lunar_edition(self) then
-                local phase, evolution = get_odyssey_lunar_phase()
-                evolution = tonumber(evolution) or 0
-                
-                -- Phase 3: Full Moon
-                if phase == 3 then
-                    local xmult = 1.5
-                    if evolution == 1 then xmult = 2
-                    elseif evolution == 2 then xmult = 2.25
-                    elseif evolution >= 3 then xmult = 2.5 end
-                    
-                    return {
-                        message = "X" .. tostring(xmult),
-                        Xmult_mod = xmult,
-                        colour = G.C.PURPLE
-                    }
-                end
-                
-                -- Phase 5: Eclipse
-                if phase == 5 then
-                    return {
-                        message = "Eclipse!",
-                        chips = 15,
-                        Xmult_mod = 4,
-                        colour = G.C.DARK_EDITION
-                    }
-                end
-            end
-        end
-    end
-    return ret
-end
+-- Card.calculate_joker hook removed as XMult is now properly handled by SMODS.Edition config in editions.lua
+
