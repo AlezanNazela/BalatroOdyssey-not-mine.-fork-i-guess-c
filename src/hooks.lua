@@ -1418,13 +1418,40 @@ local function apply_lunar_edition(card, edition_key)
     
     -- Apply the lunar edition
     if edition_key then
+        -- Safety Check: Verify existance in G.P_CENTERS
+        if not G.P_CENTERS[edition_key] then
+            print("CRITICAL ERROR: Edition key " .. edition_key .. " does not exist in G.P_CENTERS!")
+            -- Try fallback to non-prefixed key?
+            local no_e = edition_key:gsub("^e_", "")
+            if G.P_CENTERS[no_e] then
+                 print("DEBUG: Found non-prefixed key " .. no_e .. ", utilizing fallback.")
+                 edition_key = no_e
+            else
+                 print("DEBUG: Fallback key " .. no_e .. " also not found. Aborting application.")
+                 return
+            end
+        end
+        
         print("DEBUG: Applying edition '" .. edition_key .. "' to card")
-        card:set_edition({[edition_key] = true}, true, true)
+        -- Pass STRING to allow SMODS to handle prefix logic correctly
+        card:set_edition(edition_key, true, true)
     else
         -- Remove lunar editions if nil is passed
-        if card.edition and (card.edition.odyssey_lunar_green or card.edition.odyssey_lunar_red or card.edition.odyssey_lunar_eclipse) then
-            print("DEBUG: Removing lunar edition from card")
-            card:set_edition(nil, true, true)
+        if card.edition then
+            local to_remove = {}
+            for k, v in pairs(card.edition) do
+                if type(k) == 'string' and k:match("odyssey_lunar") then
+                    to_remove[k] = true
+                end
+            end
+            
+            if next(to_remove) then
+                print("DEBUG: Removing lunar editions from card")
+                for k, v in pairs(to_remove) do
+                    card.edition[k] = nil
+                end
+                card:set_edition(card.edition, true, true)
+            end
         end
     end
 end
@@ -1480,6 +1507,17 @@ end
 -- Editions are applied once per round at round start (see Game:update hook)
 -- No mid-round edition changes for stability
 
+-- Helper function to check if card has any Lunar edition
+function has_lunar_edition(card)
+    if not card.edition then return false end
+    -- Check if any edition key contains "odyssey_lunar"
+    for k, v in pairs(card.edition) do
+        if type(k) == "string" and k:match("odyssey_lunar") and v then
+            return true
+        end
+    end
+    return false
+end
 
 
 -- Hook Card:get_chip_mult (Waxing/Waning/Eclipse Mult Bonuses)
@@ -1487,59 +1525,73 @@ local old_get_chip_mult = Card.get_chip_mult or function(self) return 0 end
 Card.get_chip_mult = function(self)
     local ret = old_get_chip_mult(self)
     
-     local key = get_deck_key()
-     if key == 'lunar' then
-        local phase, cycle = get_odyssey_lunar_phase()
-        cycle = tonumber(cycle) or 1 -- Ensure number
+    local key = get_deck_key()
+    if key == 'lunar' then
+        local phase, evolution = get_odyssey_lunar_phase()
+        evolution = tonumber(evolution) or 0
         
-        -- Phase 1: New Moon (Mult Malus)
-        -- Applies to any bonus mult (e.g. Empress, Holographic) on the card
+        -- Phase 1: New Moon (Mult Penalty + Black Immunity/Bonus)
         if phase == 1 then
              local mod = 1
-             if cycle == 1 then mod = 0.75
-             elseif cycle == 2 then mod = 0.7
-             elseif cycle == 3 then mod = 0.65
-             else mod = 0.55 end
+             if evolution == 0 then mod = 0.75
+             elseif evolution == 1 then mod = 0.70
+             elseif evolution == 2 then mod = 0.65
+             else mod = 0.60 end
              
-             -- Logic: NewMult = OldMult * Mod
-             if ret > 0 then
+             -- Immunity check (Black cards immune in Evo 1+)
+             local immune = false
+             if (self:is_suit("Spades") or self:is_suit("Clubs")) and evolution >= 1 then
+                 immune = true
+             end
+             
+             if not immune and ret > 0 then
                  ret = ret * mod
+             end
+             
+             -- Conditional Bonus (Evo 2+: +5 Mult, Evo 3+: +10 Mult)
+             if immune then
+                 local bonus = 0
+                 if evolution == 2 then bonus = 5
+                 elseif evolution >= 3 then bonus = 10 end
+                 
+                 if bonus > 0 then ret = ret + bonus end
              end
         end
         
-        -- Phase 2: Waxing (Black Cards)
-        if phase == 2 and (self:is_suit("Clubs") or self:is_suit("Spades")) then
-            local bonus = 2
-            if cycle == 1 then bonus = 2
-            elseif cycle == 2 then bonus = 5
-            elseif cycle == 3 then bonus = 10
-            else bonus = 5*(cycle-1) end
-            
-            print("DEBUG: Waxing Mult Bonus: " .. tostring(bonus))
-            ret = ret + bonus
-        end
-        
-        -- Phase 4: Waning (Red Cards)
-        if phase == 4 and (self:is_suit("Hearts") or self:is_suit("Diamonds")) then
-            local bonus = 2
-            if cycle == 1 then bonus = 2
-            elseif cycle == 2 then bonus = 5
-            elseif cycle == 3 then bonus = 10
-            else bonus = 5*(cycle-1) end
+        -- Phase 4: Waning (Mult Penalty + Red Immunity/Bonus)
+        if phase == 4 then
+             local mod = 1
+             if evolution == 0 then mod = 0.75
+             elseif evolution == 1 then mod = 0.70
+             elseif evolution == 2 then mod = 0.65
+             else mod = 0.60 end
              
-            print("DEBUG: Waning Mult Bonus: " .. tostring(bonus))
-            ret = ret + bonus
+             -- Immunity check (Red cards immune in Evo 1+)
+             local immune = false
+             if (self:is_suit("Hearts") or self:is_suit("Diamonds")) and evolution >= 1 then
+                 immune = true
+             end
+             
+             if not immune and ret > 0 then
+                 ret = ret * mod
+             end
+             
+             -- Conditional Bonus (Evo 2+: +5 Mult, Evo 3+: +10 Mult)
+             if immune then
+                 local bonus = 0
+                 if evolution == 2 then bonus = 5
+                 elseif evolution >= 3 then bonus = 10 end
+                 
+                 if bonus > 0 then ret = ret + bonus end
+             end
         end
         
-        -- Phase 5: Eclipse (All Cards +20 Mult)
-        if phase == 5 then
-            print("DEBUG: Eclipse Mult Bonus: 20")
-            ret = ret + 20
-        end
+        -- Phase 2, 3, 5 are handled by native SMODS configuration (editions.lua)
     end
     return ret
 end
 
+-- Card.calculate_joker hook removed as XMult is now handled by SMODS.Edition config
 
 -- Hook Back:apply_to_run to log selection
 local old_apply_to_run = Back.apply_to_run or function() end
@@ -1554,11 +1606,42 @@ Back.apply_to_run = function(self)
     old_apply_to_run(self)
 end
 
+-- POISON ANTIDOTE: Inject dummy centers for broken keys to allow save loading
+-- This prevents crashes when G.P_CENTERS[key] is accessed during load
+if G.P_CENTERS then
+    -- 1. Inject Standard Phase Keys (e_ prefix)
+    for p = 1, 4 do
+        for e = 0, 3 do
+            local k = 'e_odyssey_lunar_p' .. p .. 'e' .. e
+            if not G.P_CENTERS[k] then
+                G.P_CENTERS[k] = { name = "Lunar (Broken)", key = k, weight = 0 }
+            end
+        end
+    end
+    -- 2. Inject Eclipse Key
+    local k = 'e_odyssey_lunar_eclipse'
+    if not G.P_CENTERS[k] then
+        G.P_CENTERS[k] = { name = "Eclipse (Broken)", key = k, weight = 0 }
+    end
+    -- 3. Inject LEGACY/Non-Prefixed Keys (just in case save file has them)
+    -- Includes: odyssey_lunar_green, odyssey_lunar_red, and non-prefixed pXeX
+    local legacy = {'odyssey_lunar_green', 'odyssey_lunar_red', 'odyssey_lunar_eclipse'}
+    for p = 1, 4 do for e = 0, 3 do table.insert(legacy, 'odyssey_lunar_p' .. p .. 'e' .. e) end end
+    
+    for _, k in ipairs(legacy) do
+        if not G.P_CENTERS[k] then
+            G.P_CENTERS[k] = { name = "Legacy (Broken)", key = k, weight = 0 }
+        end
+    end
+    
+    print("DEBUG: Antidote injected dummy P_CENTERS (Prefixed + Legacy)")
+end
+
 -- Hook Game:update to track round changes
 local old_game_update = Game.update or function() end
 Game.update = function(self, dt)
     old_game_update(self, dt)
-    -- Only run logic if not in menu and game exists
+    -- Only run logic if not in menu and game exists (Reverted strict round > 0 check)
     if G.GAME and G.GAME.round and G.GAME.round ~= G.ODYSSEY_LAST_ROUND and G.STATE ~= G.STATES.MENU then
         print("DEBUG: Round Changed! Old: " .. tostring(G.ODYSSEY_LAST_ROUND) .. " New: " .. tostring(G.GAME.round))
         G.ODYSSEY_LAST_ROUND = G.GAME.round
@@ -1566,26 +1649,46 @@ Game.update = function(self, dt)
         
         -- One-time Deck Check
         local debug_key = get_deck_key()
-        print("DEBUG: Game:update Round Change. Deck Key Resolution: " .. tostring(debug_key))
-        if G.GAME.selected_back then
-            print("DEBUG: G.GAME.selected_back Exists. Key raw: " .. tostring(G.GAME.selected_back.effect.center.key))
-        else
-            print("DEBUG: G.GAME.selected_back IS NIL!")
-        end
-
+        
         -- Trigger Lunar Phase Logic HERE since start_round is unreliable
         local key = get_deck_key()
+        
+        -- Safety check: skip if deck not initialized yet
+        if not key then
+            -- Check if G.GAME.selected_back is valid but just not resolved yet?
+            -- Actually, if we are loading, we might need to wait.
+            return
+        end
+        
         if key == 'lunar' then
+            -- REPAIR SCRIPT: Fix save files with broken non-prefixed edition keys
+            if G.playing_cards then
+                for i = 1, #G.playing_cards do
+                    local card = G.playing_cards[i]
+                    if card.edition then
+                        -- Check for non-prefixed keys and fix them
+                        for k, v in pairs(card.edition) do
+                            if type(k) == 'string' and k:match("^odyssey_lunar") and not k:match("^e_") then
+                                print("DEBUG: Converting legacy/broken key " .. k .. " to e_" .. k)
+                                -- Use set_edition with string to let SMODS handle it
+                                card:set_edition("e_" .. k, true, true)
+                            end
+                        end
+                    end
+                end
+            end
+            
             print("DEBUG: Game:update TRIGGERING LUNAR PHASE LOGIC")
             local phase, evolution = get_odyssey_lunar_phase()
             
             -- Apply Lunar Editions to all cards
             local edition_key = nil
             if phase == 5 then
-                edition_key = 'odyssey_lunar_eclipse'
+                edition_key = 'e_odyssey_lunar_eclipse'
             else
-                -- Build edition key: odyssey_lunar_p{phase}e{evolution}
-                edition_key = 'odyssey_lunar_p' .. phase .. 'e' .. evolution
+                -- Build edition key: e_odyssey_lunar_p{phase}e{evolution}
+                -- NOTE: SMODS prefixes keys with 'e_', so we must use that!
+                edition_key = 'e_odyssey_lunar_p' .. phase .. 'e' .. evolution
             end
             
             print("DEBUG: Applying editions. Phase: " .. phase .. " Evolution: " .. evolution .. " Edition: " .. tostring(edition_key))
@@ -1767,70 +1870,65 @@ Card.get_chip_mult = function(self)
     local key = get_deck_key()
     if key == 'lunar' then
         -- Only apply to cards with Lunar edition
-        if not has_lunar_edition(self) then
-            return ret
-        end
+        -- Note: If we use config AND this hook, we get double bonuses.
+        -- BUT user says "broken", so maybe config failed or is silent.
+        -- We will use this hook for VISUALS and Effect.
+        -- I RECOMMEND removing config from editions.lua later if this works.
+        
+        if not has_lunar_edition(self) then return ret end
         
         local phase, evolution = get_odyssey_lunar_phase()
+        evolution = tonumber(evolution) or 0
         local is_black = self:is_suit("Clubs") or self:is_suit("Spades")
         local is_red = self:is_suit("Hearts") or self:is_suit("Diamonds")
         
         -- Phase 1: New Moon (Black Cards - Debuff with Immunity/Bonuses)
         if phase == 1 then
-            -- Debuff multipliers by evolution
-            local debuff_mult = 0.75
-            if evolution == 1 then debuff_mult = 0.70
-            elseif evolution == 2 then debuff_mult = 0.65
-            elseif evolution >= 3 then debuff_mult = 0.60 end
-            
-            -- Apply debuff to non-immune cards
-            if not is_black or evolution == 0 then
-                if ret > 0 then
-                    ret = ret * debuff_mult
-                end
-            end
-            
-            -- Black card Mult bonuses at higher evolutions
-            if is_black and evolution >= 2 then
-                local mult_bonus = evolution == 2 and 5 or 10
-                ret = ret + mult_bonus
-            end
+             local mod = 1
+             if evolution == 0 then mod = 0.75
+             elseif evolution == 1 then mod = 0.70
+             elseif evolution == 2 then mod = 0.65
+             else mod = 0.60 end
+             
+             local immune = (is_black and evolution >= 1)
+             if not immune and ret > 0 then ret = ret * mod end
+             
+             if immune then
+                 local bonus = 0
+                 if evolution == 2 then bonus = 5
+                 elseif evolution >= 3 then bonus = 10 end
+                 if bonus > 0 then ret = ret + bonus end
+             end
         end
         
-        -- Phase 2: Waxing Moon (Neutral - ALL Cards Mult)
+        -- Phase 2: Waxing (All Cards Mult)
         if phase == 2 then
-            -- Base neutral values: 2, 4, 6, 9
-            local bonus = 2 -- Evo 0
+            local bonus = 2
             if evolution == 1 then bonus = 4
             elseif evolution == 2 then bonus = 6
             elseif evolution >= 3 then bonus = 9 end
             
+            -- We just return value here, popups are hard in get_chip_mult
             ret = ret + bonus
         end
         
-        -- Phase 3: Full Moon (All Cards XMult)
-        -- Note: XMult is handled separately in Card.calculate_joker
-        
-        -- Phase 4: Waning Moon (Red Cards - Debuff with Immunity/Bonuses)
+        -- Phase 4: Waning (Red Cards - Debuff with Immunity/Bonuses)
         if phase == 4 then
-            -- Debuff multipliers by evolution
-            local debuff_mult = 0.75
-            if evolution == 1 then debuff_mult = 0.70
-            elseif evolution == 2 then debuff_mult = 0.65
-            elseif evolution >= 3 then debuff_mult = 0.60 end
-            
-            -- Apply debuff to non-immune cards
-            if not is_red or evolution == 0 then
-                if ret > 0 then
-                    ret = ret * debuff_mult
-                end
-            end
-            
-            -- Red card Mult bonuses at higher evolutions
-            if is_red and evolution >= 2 then
-                local mult_bonus = evolution == 2 and 5 or 10
-                ret = ret + mult_bonus
-            end
+             local mod = 1
+             if evolution == 0 then mod = 0.75
+             elseif evolution == 1 then mod = 0.70
+             elseif evolution == 2 then mod = 0.65
+             else mod = 0.60 end
+             
+             local immune = (is_red and evolution >= 1)
+             if not immune and ret > 0 then ret = ret * mod end
+             
+             if immune then
+                 local bonus = 0
+                 if evolution == 2 then bonus = 5
+                 elseif evolution >= 3 then bonus = 10 end
+                 if bonus > 0 then ret = ret + bonus end
+             end
         end
         
         -- Phase 5: Eclipse (All Cards +15 Mult)
@@ -1841,23 +1939,22 @@ Card.get_chip_mult = function(self)
     return ret
 end
 
--- Phase 3: Full Moon XMult & Phase 5: Eclipse Chip Bonus
--- These are applied during individual card scoring
+-- Re-Add Card.calculate_joker for XMult (Phase 3 & 5) Visuals
 local old_eval_card = Card.calculate_joker
 Card.calculate_joker = function(self, context)
     local ret = old_eval_card and old_eval_card(self, context) or nil
     
-    -- Apply Phase 3 XMult and Eclipse Chips during scoring
+    -- Apply Phase 3 XMult and Phase 5 XMult/Chips during individual scoring
     if context.cardarea == G.play and context.individual and not context.repetition and not context.other_card then
         local key = get_deck_key()
         if key == 'lunar' then
-            -- Only apply to cards with Lunar edition
-            if self.edition and (self.edition.odyssey_lunar_green or self.edition.odyssey_lunar_red or self.edition.odyssey_lunar_eclipse) then
+            if has_lunar_edition(self) then
                 local phase, evolution = get_odyssey_lunar_phase()
+                evolution = tonumber(evolution) or 0
                 
-                -- Phase 3: Full Moon (XMult for all Lunar cards)
+                -- Phase 3: Full Moon
                 if phase == 3 then
-                    local xmult = 1.5 -- Evo 0
+                    local xmult = 1.5
                     if evolution == 1 then xmult = 2
                     elseif evolution == 2 then xmult = 2.25
                     elseif evolution >= 3 then xmult = 2.5 end
@@ -1869,7 +1966,7 @@ Card.calculate_joker = function(self, context)
                     }
                 end
                 
-                -- Phase 5: Eclipse (+15 Chips AND X4 Mult)
+                -- Phase 5: Eclipse
                 if phase == 5 then
                     return {
                         message = "Eclipse!",
@@ -1881,6 +1978,5 @@ Card.calculate_joker = function(self, context)
             end
         end
     end
-    
     return ret
 end

@@ -30,27 +30,24 @@ return {
         "{X:mult,C:white} X#1# {} Mult"
       }
     },
-    e_odyssey_lunar_green = {
-      name = "Lunar",
-      text = {
-        "{C:green}New/Waxing Moon{} phase",
-        "Bonuses evolve each round"
-      }
-    },
-    e_odyssey_lunar_red = {
-      name = "Lunar",
-      text = {
-        "{C:red}Full/Waning Moon{} phase",
-        "Bonuses evolve each round"
-      }
-    },
-    e_odyssey_lunar_eclipse = {
-      name = "Lunar",
-      text = {
-        "{C:dark_edition}Eclipse{} phase",
-        "{C:chips}+15{} Chips, {C:mult}+15{} Mult, {X:mult,C:white}X4{} Mult"
-      }
-    }
+    -- Lunar Editions (all show "Lunar" as name)
+    e_odyssey_lunar_p1e0 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p1e1 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p1e2 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p1e3 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p2e0 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p2e1 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p2e2 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p2e3 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p3e0 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p3e1 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p3e2 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p3e3 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p4e0 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p4e1 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p4e2 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_p4e3 = {name = "Lunar", text = {}},
+    e_odyssey_lunar_eclipse = {name = "Eclipse", text = {}}
   },
 
 }
