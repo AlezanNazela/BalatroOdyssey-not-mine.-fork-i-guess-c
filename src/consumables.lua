@@ -1253,6 +1253,10 @@ for _, s in ipairs(spectrals) do
         pos = { x = 0, y = 0 },
         cost = 4,
         discovered = true,
+        loc_txt = {
+            name = s.name,
+            text = { "{C:spectral}" .. s.name .. "{}" }
+        },
         can_use = function(self, card)
             return true
         end,

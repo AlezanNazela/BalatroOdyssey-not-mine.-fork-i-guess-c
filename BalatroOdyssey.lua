@@ -71,6 +71,7 @@ local files = {
     "src/atlases.lua",
     "src/utils.lua",
     "src/editions.lua",
+    "src/lunar_effects.lua",
     "src/hooks.lua",
     "src/vouchers.lua",
     "src/consumables.lua",

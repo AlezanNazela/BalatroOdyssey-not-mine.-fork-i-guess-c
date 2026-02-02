@@ -3,9 +3,48 @@
 -- Total: 16 rounds (4 phases × 4 evolutions) + Eclipse
 
 -- Register Shaders (shared across editions)
-SMODS.Shader({key = 'lunar_green', path = 'lunar_green.fs'})
-SMODS.Shader({key = 'lunar_red', path = 'lunar_red.fs'})
-SMODS.Shader({key = 'lunar_eclipse', path = 'lunar_eclipse.fs'})
+SMODS.Shader({
+    key = 'lunar_green', 
+    path = 'lunar_green.fs',
+    send_vars = function(sprite, card)
+        if not card or not card.base or not card.base.suit then return {} end
+        local suit = card.base.suit
+        local id = 0.0
+        if suit == 'Hearts' then id = 1.0
+        elseif suit == 'Clubs' then id = 2.0
+        elseif suit == 'Diamonds' then id = 3.0
+        elseif suit == 'Spades' then id = 4.0 end
+        return { lunar_suit_id = id }
+    end
+})
+SMODS.Shader({
+    key = 'lunar_red', 
+    path = 'lunar_red.fs',
+    send_vars = function(sprite, card)
+        if not card or not card.base or not card.base.suit then return {} end
+        local suit = card.base.suit
+        local id = 0.0
+        if suit == 'Hearts' then id = 1.0
+        elseif suit == 'Clubs' then id = 2.0
+        elseif suit == 'Diamonds' then id = 3.0
+        elseif suit == 'Spades' then id = 4.0 end
+        return { lunar_suit_id = id }
+    end
+})
+SMODS.Shader({
+    key = 'lunar_eclipse', 
+    path = 'lunar_eclipse.fs',
+    send_vars = function(sprite, card)
+        if not card or not card.base or not card.base.suit then return {} end
+        local suit = card.base.suit
+        local id = 0.0
+        if suit == 'Hearts' then id = 1.0
+        elseif suit == 'Clubs' then id = 2.0
+        elseif suit == 'Diamonds' then id = 3.0
+        elseif suit == 'Spades' then id = 4.0 end
+        return { lunar_suit_id = id }
+    end
+})
 
 -- EVOLUTION 0 (Rounds 1-4)
 SMODS.Edition({

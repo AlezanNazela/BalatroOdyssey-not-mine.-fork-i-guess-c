@@ -231,4 +231,24 @@ payload = '''
 '''
 match_indent = true
 
-
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = "G.SHADERS[v]:send('dissolve', G.CONTROLLER.cursor_down_time > 0 and 1 or 0)"
+position = "after"
+payload = '''
+    -- Puente Universal Balatro Odyssey
+    if G.SHADERS[v]:hasUniform('lunar_suit_id') then
+        local _id = 0.5 -- Valor de "latido" (Amarillo)
+        -- Intentamos detectar la carta desde el stack de dibujo de SMODS
+        if G.OR_CARD and G.OR_CARD.base then
+            local _s = G.OR_CARD.base.suit
+            if _s == 'Hearts' then _id = 1.0
+            elseif _s == 'Clubs' then _id = 2.0
+            elseif _s == 'Diamonds' then _id = 3.0
+            else _id = 4.0 end -- Spades o otros
+        end
+        G.SHADERS[v]:send('lunar_suit_id', _id)
+    end
+'''
+match_indent = true

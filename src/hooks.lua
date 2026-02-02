@@ -1291,7 +1291,7 @@ G.UIDEF.run_info_spectrals = function()
     local nodes = {}
     if #active_spectrals == 0 then
         table.insert(nodes, {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
-            {n=G.UIT.T, config={text = localize('k_no_active_spectrals'), scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+            {n=G.UIT.T, config={text = "No used Spectral cards", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
         }})
     else
         for _, effect in ipairs(active_spectrals) do
@@ -1695,7 +1695,7 @@ Game.update = function(self, dt)
                 end
             end
             
-            print("DEBUG: Game:update TRIGGERING LUNAR PHASE LOGIC")
+            -- print("DEBUG: Game:update TRIGGERING LUNAR PHASE LOGIC")
             local phase, evolution = get_odyssey_lunar_phase()
             
             -- Apply Lunar Editions to all cards
@@ -1705,10 +1705,11 @@ Game.update = function(self, dt)
             else
                 -- Build edition key: e_odyssey_lunar_p{phase}e{evolution}
                 -- NOTE: SMODS prefixes keys with 'e_', so we must use that!
+                if evolution < 0 then evolution = 0 end -- Safety clamp for evolution
                 edition_key = 'e_odyssey_lunar_p' .. phase .. 'e' .. evolution
             end
             
-            print("DEBUG: Applying editions. Phase: " .. phase .. " Evolution: " .. evolution .. " Edition: " .. tostring(edition_key))
+            -- print("DEBUG: Applying editions. Phase: " .. phase .. " Evolution: " .. evolution .. " Edition: " .. tostring(edition_key))
             
             
             -- Store current phase/evolution globally for tooltip access
@@ -1720,7 +1721,7 @@ Game.update = function(self, dt)
             
             -- Apply to all cards in deck (only if they don't have a non-Lunar edition)
             if G.playing_cards then
-                print("DEBUG: Found G.playing_cards, applying to " .. #G.playing_cards .. " cards")
+                -- print("DEBUG: Found G.playing_cards, applying to " .. #G.playing_cards .. " cards")
                 for i = 1, #G.playing_cards do
                     local card = G.playing_cards[i]
                     -- Only apply if card has no edition, or already has a Lunar edition
@@ -1959,3 +1960,10 @@ end
 -- Re-Add Card.calculate_joker for XMult (Phase 3 & 5) Visuals
 -- Card.calculate_joker hook removed as XMult is now properly handled by SMODS.Edition config in editions.lua
 
+----------------------------------------------
+-- COSMIC PARTICLE SYSTEMS (AURA & RUNES)
+----------------------------------------------
+print("DEBUG: Defining Card:update hook for Particles")
+----------------------------------------------
+-- SHADER UNIFORM INJECTION HOOK (BRUTE FORCE - CORRECTED)
+----------------------------------------------

@@ -13,14 +13,16 @@ function get_odyssey_lunar_phase()
     local round = G.GAME.round
     
     -- Eclipse starts at round 17 (after 4 full cycles of 4 phases)
-    if round >= 17 then
+    local adjusted_round = round + 1
+    
+    if adjusted_round >= 17 then
         return 5, 0 -- Eclipse, no evolution levels
     end
     
     -- Phase cycles 1-4 every 4 rounds
     -- Round 1=Phase1, R2=Phase2, R3=Phase3, R4=Phase4, R5=Phase1(Evo1), etc
-    local phase = ((round - 1) % 4) + 1  -- Cycles 1,2,3,4,1,2,3,4...
-    local evolution = math.floor((round - 1) / 4)  -- 0 for rounds 1-4, 1 for 5-8, 2 for 9-12, 3 for 13-16
+    local phase = ((adjusted_round - 1) % 4) + 1  -- Cycles 1,2,3,4,1,2,3,4...
+    local evolution = math.floor((adjusted_round - 1) / 4)  -- 0 for rounds 1-4, 1 for 5-8, 2 for 9-12, 3 for 13-16
     
     return phase, evolution
 end
