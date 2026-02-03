@@ -11044,6 +11044,12 @@ local local_jokers = {
         pos = { x = 0, y = 0 },
         blueprint_compat = false,
         config = {},
+        add_to_deck = function(self, card, from_debuff)
+            G.GAME.modifiers.odyssey_noclip = (G.GAME.modifiers.odyssey_noclip or 0) + 1
+        end,
+        remove_from_deck = function(self, card, from_debuff)
+            G.GAME.modifiers.odyssey_noclip = (G.GAME.modifiers.odyssey_noclip or 0) - 1
+        end
     },
     {
         key = 'j_glitch_speedrun',
@@ -11492,8 +11498,12 @@ local local_jokers = {
         calculate = function(self, card, context)
             if context.discard and not context.blueprint then
                 if context.other_card then
-                    local new_rank = pseudorandom_element({'2','3','4','5','6','7','8','9','10','J','Q','K','A'}, pseudorandom('hex_editor_rank'))
-                    local new_suit = pseudorandom_element({'Spades','Hearts','Clubs','Diamonds'}, pseudorandom('hex_editor_suit'))
+                    local ranks = {'2','3','4','5','6','7','8','9','10','J','Q','K','A'}
+                    local suits = {Spades = 'S', Hearts = 'H', Clubs = 'C', Diamonds = 'D'}
+                    local suit_names = {'Spades','Hearts','Clubs','Diamonds'}
+                    local new_rank = pseudorandom_element(ranks, pseudorandom('hex_editor_rank'))
+                    local new_suit_name = pseudorandom_element(suit_names, pseudorandom('hex_editor_suit'))
+                    local new_suit = suits[new_suit_name]
                     context.other_card:set_base(G.P_CARDS[new_suit..'_'..new_rank])
                     return {
                         message = 'Edited!',
@@ -11577,7 +11587,7 @@ local local_jokers = {
         cost = 8,
         atlas = 'j_glitch_root_access',
         pos = { x = 0, y = 0 },
-        config = { extra = { bonus_slots = 3 } },
+        config = { extra = { bonus_slots = 5 } },
         blueprint_compat = false,
         add_to_deck = function(self, card, from_debuff)
             G.consumeables.config.card_limit = G.consumeables.config.card_limit + card.ability.extra.bonus_slots
@@ -23750,12 +23760,25 @@ SMODS.Joker({
         if context.after and G.GAME.current_round.hands_left == 0 and not card.ability.extra_hand_given then
              G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + 1
              card.ability.extra_hand_given = true
-             return { 
+             G.GAME.odyssey_ghost_hand_active = true
+             return {
                  message = "Ghost Hand!",
                  colour = G.C.FILTER
              }
         end
-        if context.end_of_round and not context.other_card then card.ability.extra_hand_given = false end
+        if context.end_of_round and not context.other_card then 
+            card.ability.extra_hand_given = false
+            G.GAME.odyssey_ghost_hand_active = false
+        end
+        if context.after and card.ability.extra_hand_given then
+            -- Reset after the hand plays
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    G.GAME.odyssey_ghost_hand_active = false
+                    return true
+                end
+            }))
+        end
     end
 })
 
@@ -24385,7 +24408,7 @@ SMODS.Joker({
     end,
     remove_from_deck = function(self, card, from_debuff)
         if G.GAME then
-            G.play.config.card_limit = 10
+            G.play.config.card_limit = 5
         end
     end,
     loc_vars = function(self, info_queue, card) return { vars = { ( (card and card.ability and card.ability.extra) or self.config.extra ) } } end,
@@ -25184,10 +25207,14 @@ SMODS.Joker({
     cost = 6,
     unlocked = true,
     discovered = true,
-    -- Placeholder: Protege contra debuffs de Boss
-    loc_vars = function(self, info_queue, card) return { vars = {} } end,
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_evil_eye = (G.GAME.modifiers.odyssey_evil_eye or 0) + 1
+    end,
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_evil_eye = (G.GAME.modifiers.odyssey_evil_eye or 0) - 1
+    end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        -- Protection core is in Card:set_debuff override in utils.lua
     end
 })
 
@@ -26077,10 +26104,14 @@ SMODS.Joker({
     atlas = 'j_transformations_magic_mirror',
     pos = { x = 0, y = 0 },
     cost = 5,
-    blueprint_compat = false,
-    loc_vars = function(self, info_queue, card) return { vars = {} } end,
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_magic_mirror = (G.GAME.modifiers.odyssey_magic_mirror or 0) + 1
+    end,
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_magic_mirror = (G.GAME.modifiers.odyssey_magic_mirror or 0) - 1
+    end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        -- Protection core is in Card:get_id override in utils.lua
     end
 })
 
@@ -26277,11 +26308,20 @@ SMODS.Joker({
     cost = 5,
     calculate = function(self, card, context)
         if context.before and not context.blueprint then
+            local triggered = false
             for k, v in ipairs(context.scoring_hand) do
                 if v:is_face() then
-                    local rank = math.random(2, 10)
-                    -- SMODS rank change logic
+                    local rank = pseudorandom_element({'2','3','4','5','6','7','8','9','10'}, pseudorandom('polymorph'))
+                    local suit = v.base.suit:sub(1,1)
+                    v:set_base(G.P_CARDS[suit..'_'..rank])
+                    triggered = true
                 end
+            end
+            if triggered then 
+                return {
+                    message = "Polymorph!",
+                    colour = G.C.FILTER
+                }
             end
         end
     end
@@ -26297,10 +26337,14 @@ SMODS.Joker({
     atlas = 'j_transformations_mask',
     pos = { x = 0, y = 0 },
     cost = 5,
-    -- Implementation usually handled in vanilla_override via is_suit
-    loc_vars = function(self, info_queue, card) return { vars = {} } end,
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_mask = (G.GAME.modifiers.odyssey_mask or 0) + 1
+    end,
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_mask = (G.GAME.modifiers.odyssey_mask or 0) - 1
+    end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        -- Logic handled in Card:is_suit override
     end
 })
 
@@ -26314,10 +26358,14 @@ SMODS.Joker({
     atlas = 'j_transformations_disguise',
     pos = { x = 0, y = 0 },
     cost = 5,
-    -- Implementation in vanilla_override via is_face
-    loc_vars = function(self, info_queue, card) return { vars = {} } end,
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_disguise = (G.GAME.modifiers.odyssey_disguise or 0) + 1
+    end,
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_disguise = (G.GAME.modifiers.odyssey_disguise or 0) - 1
+    end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        -- Logic handled in Card:is_face override
     end
 })
 
@@ -26358,10 +26406,14 @@ SMODS.Joker({
     atlas = 'j_transformations_makeup',
     pos = { x = 0, y = 0 },
     cost = 5,
-    -- Implementation in vanilla_override via is_suit (color swap)
-    loc_vars = function(self, info_queue, card) return { vars = {} } end,
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_makeup = (G.GAME.modifiers.odyssey_makeup or 0) + 1
+    end,
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_makeup = (G.GAME.modifiers.odyssey_makeup or 0) - 1
+    end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        -- Logic handled in Card:is_suit override
     end
 })
 
@@ -26375,10 +26427,14 @@ SMODS.Joker({
     atlas = 'j_transformations_wig',
     pos = { x = 0, y = 0 },
     cost = 4,
-    -- Implementation: Kings count as Queens (vanilla_override)
-    loc_vars = function(self, info_queue, card) return { vars = {} } end,
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_wig = (G.GAME.modifiers.odyssey_wig or 0) + 1
+    end,
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_wig = (G.GAME.modifiers.odyssey_wig or 0) - 1
+    end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        -- Logic handled in Card:get_id override
     end
 })
 
@@ -26392,10 +26448,14 @@ SMODS.Joker({
     atlas = 'j_transformations_fake_beard',
     pos = { x = 0, y = 0 },
     cost = 4,
-    -- Implementation: Queens count as Kings (vanilla_override)
-    loc_vars = function(self, info_queue, card) return { vars = {} } end,
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_fake_beard = (G.GAME.modifiers.odyssey_fake_beard or 0) + 1
+    end,
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_fake_beard = (G.GAME.modifiers.odyssey_fake_beard or 0) - 1
+    end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        -- Logic handled in Card:get_id override
     end
 })
 
@@ -26556,16 +26616,14 @@ SMODS.Joker({
 
     end,
     calculate = function(self, card, context)
-        if context.discard and not context.other_card and not context.blueprint then
+        if context.discard and context.other_card and not context.blueprint then
             if pseudorandom('zombie') < G.GAME.probabilities.normal / card.ability.extra.odds then
-                local discarded_card = context.other_card
-                -- This is tricky because we are in the middle of a discard
-                -- Let's just create a random card in hand as a "returned" one
                 G.E_MANAGER:add_event(Event({
                     func = function()
-                        local new_card = create_card('Suit', G.hand, nil, nil, nil, nil, nil, 'zombie')
+                        local new_card = create_card('Default', G.hand, nil, nil, nil, nil, 'm_odyssey_undead', 'zombie')
                         new_card:add_to_deck()
                         G.hand:emplace(new_card)
+                        new_card:start_materialize()
                         return true
                     end
                 }))
@@ -26659,8 +26717,14 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 7,
     loc_vars = function(self, info_queue, card) return { vars = {} } end,
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_hybrid = (G.GAME.modifiers.odyssey_hybrid or 0) + 1
+    end,
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.modifiers.odyssey_hybrid = (G.GAME.modifiers.odyssey_hybrid or 0) - 1
+    end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        -- Logic handled in Card:is_suit override
     end
 })
 
@@ -27018,7 +27082,28 @@ SMODS.Joker({
     cost = 8,
     loc_vars = function(self, info_queue, card) return { vars = {} } end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        if context.selling_self and not context.blueprint then
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    local to_replace = {}
+                    for i = 1, #G.jokers.cards do
+                        local v = G.jokers.cards[i]
+                        if v.config.center.rarity == 1 and v ~= card then
+                            table.insert(to_replace, v)
+                        end
+                    end
+                    for _, v in ipairs(to_replace) do
+                        local new_card = create_card('Joker', G.jokers, nil, 0.8, nil, nil, nil, 'transcendence')
+                        v:remove()
+                        new_card:add_to_deck()
+                        G.jokers:emplace(new_card)
+                        new_card:start_materialize()
+                    end
+                    return true
+                end
+            }))
+            return { message = "Transcended!", colour = G.C.BLUE }
+        end
     end
 })
 
@@ -27034,7 +27119,28 @@ SMODS.Joker({
     cost = 8,
     loc_vars = function(self, info_queue, card) return { vars = {} } end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        if context.selling_self and not context.blueprint then
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    local to_replace = {}
+                    for i = 1, #G.jokers.cards do
+                        local v = G.jokers.cards[i]
+                        if v.config.center.rarity == 2 and v ~= card then
+                            table.insert(to_replace, v)
+                        end
+                    end
+                    for _, v in ipairs(to_replace) do
+                        local new_card = create_card('Joker', G.jokers, nil, 0.95, nil, nil, nil, 'ascension')
+                        v:remove()
+                        new_card:add_to_deck()
+                        G.jokers:emplace(new_card)
+                        new_card:start_materialize()
+                    end
+                    return true
+                end
+            }))
+            return { message = "Ascended!", colour = G.C.ORANGE }
+        end
     end
 })
 
@@ -27050,7 +27156,20 @@ SMODS.Joker({
     cost = 10,
     loc_vars = function(self, info_queue, card) return { vars = {} } end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        if context.selling_self and not context.blueprint then
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    local rank = pseudorandom_element({'2','3','4','5','6','7','8','9','10','J','Q','K','A'}, pseudorandom('apotheosis_rank'))
+                    local suit = pseudorandom_element({'S','H','C','D'}, pseudorandom('apotheosis_suit'))
+                    local center = G.P_CARDS[suit..'_'..rank]
+                    for _, v in ipairs(G.playing_cards) do
+                        v:set_base(center)
+                    end
+                    return true
+                end
+            }))
+            return { message = "Apotheosis!", colour = G.C.GOLD }
+        end
     end
 })
 
@@ -27066,7 +27185,19 @@ SMODS.Joker({
     cost = 10,
     loc_vars = function(self, info_queue, card) return { vars = {} } end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        if context.selling_self and not context.blueprint then
+             -- Singularity: Simplification - Gives a random Legendary Joker instead of merging (too complex)
+             G.E_MANAGER:add_event(Event({
+                func = function()
+                    local new_card = create_card('Joker', G.jokers, true, 4, nil, nil, nil, 'singularity')
+                    new_card:add_to_deck()
+                    G.jokers:emplace(new_card)
+                    new_card:start_materialize()
+                    return true
+                end
+            }))
+            return { message = "Singularity!", colour = G.C.BLACK }
+        end
     end
 })
 
@@ -27082,7 +27213,24 @@ SMODS.Joker({
     cost = 10,
     loc_vars = function(self, info_queue, card) return { vars = {} } end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        if context.selling_self and not context.blueprint then
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    for i = #G.playing_cards, 1, -1 do
+                        G.playing_cards[i]:remove()
+                    end
+                    G.playing_cards = {}
+                    for i = 1, 52 do
+                        local new_card = create_card('Default', G.deck, nil, nil, nil, nil, nil, 'big_bang')
+                        new_card:add_to_deck()
+                        G.deck:emplace(new_card)
+                        table.insert(G.playing_cards, new_card)
+                    end
+                    return true
+                end
+            }))
+            return { message = "Big Bang!", colour = G.C.WHITE }
+        end
     end
 })
 
@@ -27098,7 +27246,18 @@ SMODS.Joker({
     cost = 8,
     loc_vars = function(self, info_queue, card) return { vars = {} } end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        if context.selling_self and not context.blueprint then
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    local new_card = create_card('Joker', G.shop_jokers, nil, nil, nil, nil, 'j_transformations_reincarnation', 'reincarnation')
+                    new_card.ability.extra.x_mult = (card.ability.extra.x_mult or 1.2) + 0.2
+                    new_card:add_to_deck()
+                    if G.shop_jokers then G.shop_jokers:emplace(new_card) end
+                    return true
+                end
+            }))
+            return { message = "Reincarnated!", colour = G.C.RED }
+        end
     end
 })
 
@@ -27114,7 +27273,20 @@ SMODS.Joker({
     cost = 9,
     loc_vars = function(self, info_queue, card) return { vars = {} } end,
     calculate = function(self, card, context)
-        -- Auto-generated functional stub
+        if context.joker_main then
+            local evolved_count = 0
+            for _, v in ipairs(G.jokers.cards) do
+                if v.edition and v.edition.key and v.edition.key:find('odyssey_lunar') then
+                    evolved_count = evolved_count + 1
+                end
+            end
+            if evolved_count >= 5 then
+                return {
+                    x_mult = card.ability.extra.x_mult,
+                    message = localize{type='variable',key='a_xmult',vars={card.ability.extra.x_mult}}
+                }
+            end
+        end
     end
 })
 
@@ -27149,6 +27321,22 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 10,
     calculate = function(self, card, context)
+        if context.end_of_round and not context.blueprint and not context.repetition and not context.other_card then
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    for _, v in ipairs(G.playing_cards) do
+                        local rank = pseudorandom_element({'2','3','4','5','6','7','8','9','10','J','Q','K','A'}, pseudorandom('primal_chaos_rank'))
+                        local suit = pseudorandom_element({'S','H','C','D'}, pseudorandom('primal_chaos_suit'))
+                        v:set_base(G.P_CARDS[suit..'_'..rank])
+                    end
+                    return true
+                end
+            }))
+            return {
+                message = "Chaotic!",
+                colour = G.C.PURPLE
+            }
+        end
         if context.joker_main then
             return {
                 x_mult = card.ability.extra.x_mult,
@@ -28398,6 +28586,10 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 1,
     blueprint_compat = false,
+    loc_vars = function(self, info_queue, card)
+        local extra = (card and card.ability and card.ability.extra) or self.config.extra
+        return { vars = { extra.dollars, extra.req } }
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
              card.ability.extra.clicks = card.ability.extra.clicks + 1
@@ -32878,7 +33070,7 @@ SMODS.Joker({
         if context.joker_main then
             return {
                 x_mult = card.ability.extra.x_mult,
-                mult_mod = 500,
+                mult_mod = card.ability.extra.min_mult,
                 message = "ABSOLUTE"
             }
         end

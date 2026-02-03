@@ -409,7 +409,7 @@ return {
  j_odyssey_j_celestial_nebula = {
  name = "Nebula",
  text = {
- "Create a random {C:planet}Planet{} card{}", "if played hand is", "{C:attention}High Card{}"
+  "Create a random {C:planet}Planet{} card{}", "if played hand is", "{C:attention}High Card{}.{}", "{C:inactive}(Must have space){}"
  }
  },
  
@@ -437,7 +437,7 @@ return {
  j_odyssey_j_celestial_planetary_nebula = {
  name = "Planetary Nebula",
  text = {
- "Create a {C:planet}Planet{} card{}", "when you defeat a", "{C:attention}Boss Blind{}"
+ "Create a {C:planet}Planet{} card{}", "when you defeat a", "{C:attention}Boss Blind{}.{}", "{C:inactive}(Must have space){}"
  }
  },
  
@@ -1018,7 +1018,7 @@ return {
  j_odyssey_j_cond_input = {
  name = "Input",
  text = {
- "{C:mult}+10{} Mult. (WIP: Clickable mechanics)"
+ "{C:mult}+10{} Mult. (Manual Input Activation)"
  }
  },
  
@@ -2451,10 +2451,10 @@ return {
  },
  
  j_odyssey_j_final_absolute = {
- name = "Absolute",
- text = {
- "Sets your final {C:mult}Mult{} Mult to at{}", "least {C:attention}1,000{}.{}"
- }
+  name = "Absolute",
+  text = {
+  "Gives {C:mult}+#1#{} Mult and {X:mult,C:white} X#2# {} Mult"
+  }
  },
  
  j_odyssey_j_final_ascension = {
@@ -3578,10 +3578,10 @@ return {
  },
  
  j_odyssey_j_luck_and_probability_gargoyle = {
- name = "Gargoyle",
- text = {
- "{C:chips}+20{} Chips. Immune to Platinum cards{}"
- }
+  name = "Gargoyle",
+  text = {
+  "{C:chips}+#1#{} Chips if played hand contains", "an {C:attention}Emerald{} card"
+  }
  },
  
  j_odyssey_j_luck_and_probability_goddess_of_fortune = {
@@ -5209,7 +5209,7 @@ j_odyssey_j_professions_student = {
  j_odyssey_j_singularity_parallel_universe = {
  name = "Parallel Universe",
  text = {
- "{C:mult}+#1#{} Mult{}", "At {C:attention}end of round{}, if there is{}", "only {C:attention}1{} of this Joker,{}", "creates a {C:attention}mirrored copy{}"
+  "{C:mult}+#1#{} Mult{}", "At {C:attention}end of round{}, if there is{}", "only {C:attention}1{} of this Joker,{}", "creates a {C:attention}mirrored copy{}.{}", "{C:inactive}(Must have space){}"
  }
  },
  
@@ -5256,11 +5256,11 @@ j_odyssey_j_professions_student = {
  },
  
  j_odyssey_j_singularity_quantum_isolation = {
- name = "Quantum Isolation",
- text = {
- "If this is the {C:attention}only Joker{}, {}", "{C:green}#2# in #3# chance{} to {}{C:attention}duplicate{}", "at end of round. {C:mult}+#1#{} Mult{}"
- }
- },
+  name = "Quantum Isolation",
+  text = {
+  "If this is the {C:attention}only Joker{}, {}", "{C:green}#2# in #3# chance{} to {}{C:attention}duplicate{}", "at end of round. {C:mult}+#1#{} Mult.{}", "{C:inactive}(Must have space){}"
+  }
+  },
  
  j_odyssey_j_singularity_reverse_big_bang = {
  name = "Reverse Big Bang",
@@ -5454,7 +5454,7 @@ j_odyssey_j_professions_student = {
  j_odyssey_j_social_easter_egg = {
  name = "Easter Egg",
  text = {
- "{C:mult}+10{} Mult. (WIP: Clickable mechanics)"
+ "{C:mult}+10{} Mult. Gives {C:money}$#1#{} after #2# triggers{}"
  }
  },
  
@@ -5648,31 +5648,31 @@ j_odyssey_j_professions_student = {
  },
  
  j_odyssey_j_social_the_player = {
- name = "The Player",
- text = {
- "{X:mult,C:white} X5 {} Mult. Its effect{}", "changes based on your playstyle"
- }
+  name = "The Player",
+  text = {
+  "{X:mult,C:white} X5 {} Mult. Its effect{}", "changes based on your playstyle"
+  }
  },
  
  j_odyssey_j_social_trending = {
- name = "Trending",
- text = {
- "{X:mult,C:white} X1.5 {} Mult for the{}", "most played suit last round"
- }
+  name = "Trending",
+  text = {
+  "{X:mult,C:white} X1.5 {} Mult for the{}", "most played suit last round"
+  }
  },
  
  j_odyssey_j_social_troll = {
- name = "Troll",
- text = {
- "{C:mult}+30{} Mult. {}{C:green}#1# in #2#{} chance{}", "to randomly discard your hand"
- }
+  name = "Troll",
+  text = {
+  "{C:mult}+30{} Mult. {}{C:green}#2# in #3#{} chance{}", "to randomly discard your hand"
+  }
  },
  
  j_odyssey_j_social_tryhard = {
- name = "Tryhard",
- text = {
- "{C:mult}+30{} Mult, but the screen{}", "constantly shakes with intensity"
- }
+  name = "Tryhard",
+  text = {
+  "{C:mult}+30{} Mult, but the screen{}", "constantly shakes with intensity"
+  }
  },
  
  j_odyssey_j_social_viral = {
@@ -6319,18 +6319,18 @@ j_odyssey_j_professions_student = {
  }
  },
  
- j_odyssey_j_transformations_apotheose = {
- name = "Apotheosis",
- text = {
- "Transforms all cards in deck into", "a single suit and rank"
- }
+ j_odyssey_j_transformations_apotheosis = {
+  name = "Apotheosis",
+  text = {
+  "{C:attention}When sold{}, transforms all cards in deck", "into a single {C:attention}random rank and suit{}"
+  }
  },
  
  j_odyssey_j_transformations_ascension = {
- name = "Ascension",
- text = {
- "Transforms all {C:attention}Uncommon{} Jokers into {}{C:attention}Rare{}"
- }
+  name = "Ascension",
+  text = {
+  "{C:attention}When sold{}, transforms all {C:attention}Uncommon{}", "Jokers into {C:attention}Rare{}"
+  }
  },
  
  j_odyssey_j_transformations_basic_alchemy = {
@@ -6348,10 +6348,10 @@ j_odyssey_j_professions_student = {
  },
  
  j_odyssey_j_transformations_big_bang = {
- name = "Big Bang",
- text = {
- "Creates 52 random cards and", "replaces your entire deck"
- }
+  name = "Big Bang",
+  text = {
+  "{C:attention}When sold{}, creates 52 random cards", "and replaces your entire deck"
+  }
  },
  
  j_odyssey_j_transformations_catalyst = {
@@ -6467,17 +6467,17 @@ j_odyssey_j_professions_student = {
  },
  
  j_odyssey_j_transformations_hybrid = {
- name = "Hybrid",
- text = {
- "{C:mult}+10{} Mult. (In development:", "Dual-suit mechanics)"
- }
+  name = "Hybrid",
+  text = {
+  "All cards count as {C:hearts}Hearts{} and", "{C:spades}Spades{} in addition to their suit"
+  }
  },
  
  j_odyssey_j_transformations_hydra = {
- name = "Hydra",
- text = {
- "If you discard a card, draw {C:attention}two{}"
- }
+  name = "Hydra",
+  text = {
+  "When you {C:attention}discard{} cards, draw", "{C:attention}2{} extra cards total"
+  }
  },
  
  j_odyssey_j_transformations_jekyll_hyde = {
@@ -6551,10 +6551,10 @@ j_odyssey_j_professions_student = {
  },
  
  j_odyssey_j_transformations_polymorph = {
- name = "Polymorph",
- text = {
- "Turns {C:attention}Face Cards{} into{}", "random {C:attention}numbered cards{}"
- }
+  name = "Polymorph",
+  text = {
+  "Turns {C:attention}Face Cards{} into random", "{C:attention}numbered cards{} when scored"
+  }
  },
  
  j_odyssey_j_transformations_primal_chaos = {
@@ -6579,10 +6579,10 @@ j_odyssey_j_professions_student = {
  },
  
  j_odyssey_j_transformations_reincarnation = {
- name = "Reincarnation",
- text = {
- "When sold, reappears in shop", "with an improved effect"
- }
+  name = "Reincarnation",
+  text = {
+  "{C:attention}When sold{}, reappears in shop", "with an improved effect ({X:mult,C:white}X+0.2{})"
+  }
  },
  
  j_odyssey_j_transformations_shadow = {
@@ -6600,10 +6600,10 @@ j_odyssey_j_professions_student = {
  },
  
  j_odyssey_j_transformations_singularity = {
- name = "Singularity",
- text = {
- "Merges all your Jokers into a", "single {C:attention}Mega Joker{} with all effects{}"
- }
+  name = "Singularity",
+  text = {
+  "{C:attention}When sold{}, creates a random", "{C:legendary}Legendary{} Joker"
+  }
  },
  
  j_odyssey_j_transformations_siren = {
@@ -6621,10 +6621,10 @@ j_odyssey_j_professions_student = {
  },
  
  j_odyssey_j_transformations_transcendence = {
- name = "Transcendence",
- text = {
- "Transforms all {C:attention}Common{} Jokers into {}{C:attention}Uncommon{}"
- }
+  name = "Transcendence",
+  text = {
+  "{C:attention}When sold{}, transforms all {C:attention}Common{}", "Jokers into {C:attention}Uncommon{}"
+  }
  },
  
  j_odyssey_j_transformations_transmuter = {
@@ -6777,7 +6777,7 @@ j_odyssey_j_professions_student = {
  j_odyssey_j_tribal_emperor = {
  name = "Emperor",
  text = {
- "Creates {C:attention}The Emperor{} Tarot card if won in 1 hand.{}"
+ "Creates {C:attention}The Emperor{} Tarot card if won in 1 hand.{}", "{C:inactive}(Must have space){}"
  }
  },
  
@@ -6820,22 +6820,21 @@ j_odyssey_j_professions_student = {
  name = "Hero",
  text = {
  "If only 1 Life (Hand) remaining, {C:attention}X5 {}{C:mult}Mult{} Mult{}.{}"
- }
- },
- 
- j_odyssey_j_tribal_high_priestess = {
- name = "The High Priestess",
- text = {
- "Creates {C:attention}The High Priestess{} Tarot card if no discards used.{}"
- }
- },
- 
- j_odyssey_j_tribal_holy_order = {
- name = "Holy Order",
- text = {
- "Removes all card debuffs in hand.", "{C:attention}+20 {}{C:mult}Mult{} Mult{}.{}"
- }
- },
+  },
+  
+  j_odyssey_j_tribal_high_priestess = {
+  name = "The High Priestess",
+  text = {
+  "Creates {C:attention}The High Priestess{} Tarot card if no discards used.{}", "{C:inactive}(Must have space){}"
+  }
+  },
+  
+  j_odyssey_j_tribal_holy_order = {
+  name = "Holy Order",
+  text = {
+  "Removes all card debuffs in hand.", "{C:attention}+20 {}{C:mult}Mult{} Mult{}.{}"
+  }
+  },
  
  j_odyssey_j_tribal_hunter = {
  name = "Hunter",
@@ -6994,7 +6993,7 @@ j_odyssey_j_professions_student = {
  j_odyssey_j_tribal_the_hermit = {
  name = "The Hermit",
  text = {
- "Creates {C:attention}The Hermit{} Tarot card if you have $0.{}"
+ "Creates {C:attention}The Hermit{} Tarot card if you have $0.{}", "{C:inactive}(Must have space){}"
  }
  },
  

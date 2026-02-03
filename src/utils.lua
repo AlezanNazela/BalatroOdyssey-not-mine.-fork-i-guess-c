@@ -592,6 +592,7 @@ end
 local old_ease_dollars = ease_dollars
 function ease_dollars(amount, instant)
     if G.GAME.bankrupt_at and (G.GAME.dollars + amount < G.GAME.bankrupt_at) then return end
+    if G.GAME.odyssey_ghost_hand_active and amount > 0 then return end
     old_ease_dollars(amount, instant)
 end
 
@@ -599,7 +600,48 @@ end
 local old_is_suit = Card.is_suit
 function Card:is_suit(suit, bypass_debuff, flush_calc)
     if G.GAME and G.GAME.modifiers.odyssey_chameleon and not bypass_debuff then return true end
+    if G.GAME and (G.GAME.modifiers.odyssey_noclip or G.GAME.modifiers.odyssey_mask) and self:is_face() then return true end
+    
+    if G.GAME and G.GAME.modifiers.odyssey_hybrid and (suit == 'Hearts' or suit == 'Spades') then return true end
+
+    if G.GAME and G.GAME.modifiers.odyssey_makeup then
+        if suit == 'Hearts' then return old_is_suit(self, 'Spades', bypass_debuff, flush_calc)
+        elseif suit == 'Diamonds' then return old_is_suit(self, 'Clubs', bypass_debuff, flush_calc)
+        elseif suit == 'Spades' then return old_is_suit(self, 'Hearts', bypass_debuff, flush_calc)
+        elseif suit == 'Clubs' then return old_is_suit(self, 'Diamonds', bypass_debuff, flush_calc) end
+    end
+
     return old_is_suit(self, suit, bypass_debuff, flush_calc)
+end
+
+local old_is_face = Card.is_face
+function Card:is_face(bypass_debuff)
+    if G.GAME and G.GAME.modifiers.odyssey_disguise then return true end
+    return old_is_face(self, bypass_debuff)
+end
+
+local old_get_id = Card.get_id
+function Card:get_id()
+    local id = old_get_id(self)
+    if G.GAME and G.GAME.modifiers.odyssey_wig and id == 13 then return 12 end -- King -> Queen
+    if G.GAME and G.GAME.modifiers.odyssey_fake_beard and id == 12 then return 13 end -- Queen -> King
+    if G.GAME and G.GAME.modifiers.odyssey_magic_mirror then
+        -- 2(2) -> A(14), 3(3) -> K(13), ..., 14(A) -> 2(2)
+        -- Formula: 16 - id ?
+        -- 14 -> 2: 16-14=2. Correct.
+        -- 2 -> 14: 16-2=14. Correct.
+        return 16 - id
+    end
+    return id
+end
+
+local old_set_debuff = Card.set_debuff
+function Card:set_debuff(debuff)
+    if G.GAME and G.GAME.modifiers.odyssey_evil_eye and G.GAME.blind and G.GAME.blind.boss then
+        self.debuff = false
+        return
+    end
+    old_set_debuff(self, debuff)
 end
 
 local old_get_cost = Card.get_cost
