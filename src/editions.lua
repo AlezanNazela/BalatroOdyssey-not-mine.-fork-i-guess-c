@@ -171,18 +171,27 @@ SMODS.Edition({
 })
 
 -- ECLIPSE (Round 17+)
+-- editions.lua
 SMODS.Edition({
-    key = 'odyssey_lunar_eclipse', shader = 'lunar_eclipse', in_shop = false, weight = 0, extra_cost = 0, 
-    config = { x_mult = 4, x_chips = 4, mult = 15, chips = 15 },
+    key = 'odyssey_lunar_eclipse', 
+    shader = 'lunar_eclipse', 
+    in_shop = false, 
+    weight = 0, 
+    extra_cost = 0, 
+    config = {}, -- VACÍO: Evita bonos pasivos globales
     sound = {sound = 'generic1', per = 1, vol = 0.3},
-    loc_txt = {name = "Eclipse", label = "Eclipse", text = {"{C:dark_edition}THE ECLIPSE", "{C:chips}+15{} Chips, {C:mult}+15{} Mult, {X:mult,C:white}X4{} Mult"}},
+    loc_txt = {
+        name = "Eclipse", 
+        label = "Eclipse", 
+        text = {"{C:dark_edition}THE ECLIPSE", "{C:chips}+15{} Chips, {C:mult}+15{} Mult, {X:mult,C:white}X4{} Mult"}
+    },
     calculate = function(self, card, context)
-        if context.main_scoring then
+        -- FILTRO ESTRICTO: Solo si la carta está puntuando
+      if context.main_scoring and card.area == G.play then
             return {
-                x_mult = self.config.x_mult,
-                x_chips = self.config.x_chips,
-                mult = self.config.mult,
-                chips = self.config.chips,
+                x_mult = 4,
+                mult = 15,
+                chips = 15,
                 message = "ECLIPSE!",
                 colour = G.C.DARK_EDITION,
                 card = card
@@ -190,7 +199,6 @@ SMODS.Edition({
         end
     end
 })
-
 
 -- LEGACY EDITIONS (Restored for Save File Compatibility)
 -- These prevent crashes when loading saves with the old editions

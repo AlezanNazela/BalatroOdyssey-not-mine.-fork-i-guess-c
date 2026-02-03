@@ -4,6 +4,7 @@
     #define MY_HIGHP_OR_MEDIUMP mediump
 #endif
 
+// Uniforms obligatorios
 extern MY_HIGHP_OR_MEDIUMP float dissolve;
 extern MY_HIGHP_OR_MEDIUMP float time;
 extern MY_HIGHP_OR_MEDIUMP vec4 texture_details;
@@ -12,6 +13,9 @@ extern bool shadow;
 extern MY_HIGHP_OR_MEDIUMP vec4 burn_colour_1;
 extern MY_HIGHP_OR_MEDIUMP vec4 burn_colour_2;
 extern MY_HIGHP_OR_MEDIUMP float lunar_suit_id;
+
+// Agregamos el uniform que falta para evitar el crash
+extern MY_HIGHP_OR_MEDIUMP vec2 lunar_eclipse;
 
 vec4 dissolve_mask(vec4 tex, vec2 texture_coords, vec2 uv)
 {
@@ -59,7 +63,9 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
         tex.rgb = suit_color;
     }
 
-    return dissolve_mask(tex * colour, texture_coords, uv);
+    // --- ANTI-OPTIMIZACIÓN (Uso forzado de lunar_eclipse) ---
+    float dummy = lunar_eclipse.x * 0.000001;
+    return dissolve_mask(tex * colour + dummy, texture_coords, uv);
 }
 
 extern MY_HIGHP_OR_MEDIUMP vec2 mouse_screen_pos;

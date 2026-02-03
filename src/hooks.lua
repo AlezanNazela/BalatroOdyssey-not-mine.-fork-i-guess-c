@@ -1537,76 +1537,7 @@ function has_lunar_edition(card)
 end
 
 
--- Hook Card:get_chip_mult (Waxing/Waning/Eclipse Mult Bonuses)
-local old_get_chip_mult = Card.get_chip_mult or function(self) return 0 end
-Card.get_chip_mult = function(self)
-    local ret = old_get_chip_mult(self)
-    
-    local key = get_deck_key()
-    if key == 'lunar' then
-        local phase, evolution = get_odyssey_lunar_phase()
-        evolution = tonumber(evolution) or 0
-        
-        -- Phase 1: New Moon (Mult Penalty + Black Immunity/Bonus)
-        if phase == 1 then
-             local mod = 1
-             if evolution == 0 then mod = 0.75
-             elseif evolution == 1 then mod = 0.70
-             elseif evolution == 2 then mod = 0.65
-             else mod = 0.60 end
-             
-             -- Immunity check (Black cards immune in Evo 1+)
-             local immune = false
-             if (self:is_suit("Spades") or self:is_suit("Clubs")) and evolution >= 1 then
-                 immune = true
-             end
-             
-             if not immune and ret > 0 then
-                 ret = ret * mod
-             end
-             
-             -- Conditional Bonus (Evo 2+: +5 Mult, Evo 3+: +10 Mult)
-             if immune then
-                 local bonus = 0
-                 if evolution == 2 then bonus = 5
-                 elseif evolution >= 3 then bonus = 10 end
-                 
-                 if bonus > 0 then ret = ret + bonus end
-             end
-        end
-        
-        -- Phase 4: Waning (Mult Penalty + Red Immunity/Bonus)
-        if phase == 4 then
-             local mod = 1
-             if evolution == 0 then mod = 0.75
-             elseif evolution == 1 then mod = 0.70
-             elseif evolution == 2 then mod = 0.65
-             else mod = 0.60 end
-             
-             -- Immunity check (Red cards immune in Evo 1+)
-             local immune = false
-             if (self:is_suit("Hearts") or self:is_suit("Diamonds")) and evolution >= 1 then
-                 immune = true
-             end
-             
-             if not immune and ret > 0 then
-                 ret = ret * mod
-             end
-             
-             -- Conditional Bonus (Evo 2+: +5 Mult, Evo 3+: +10 Mult)
-             if immune then
-                 local bonus = 0
-                 if evolution == 2 then bonus = 5
-                 elseif evolution >= 3 then bonus = 10 end
-                 
-                 if bonus > 0 then ret = ret + bonus end
-             end
-        end
-        
-        -- Phase 2, 3, 5 are handled by native SMODS configuration (editions.lua)
-    end
-    return ret
-end
+
 
 -- Card.calculate_joker hook removed as XMult is now handled by SMODS.Edition config
 
@@ -1817,38 +1748,35 @@ local function has_lunar_edition(card)
     return false
 end
 
+------------------------------------------------------------------------
+-- LUNAR DECK: CORRECCIÓN DE PUNTUACIÓN (CHIPS & MULT)
+------------------------------------------------------------------------
+
+-- 1. Hook para Bonos de Fichas (Chips)
 Card.get_chip_bonus = function(self)
     local ret = old_get_chip_bonus(self)
     
     local key = get_deck_key()
     if key == 'lunar' then
-        -- Only apply to cards with Lunar edition
-        if not has_lunar_edition(self) then
-            return ret
-        end
+        -- FILTRO DE SEGURIDAD: Evita que el debuff afecte a la mano o al mazo
+        if self.area ~= G.play then return ret end
+        
+        if not has_lunar_edition(self) then return ret end
         
         local phase, evolution = get_odyssey_lunar_phase()
+        evolution = tonumber(evolution) or 0
         
         -- Phase 1: New Moon (Black Cards - Debuff with Immunity/Bonuses)
         if phase == 1 then
             local is_black = self:is_suit("Clubs") or self:is_suit("Spades")
+            local debuff_mult = ({0.75, 0.70, 0.65, 0.60})[evolution + 1] or 0.60
             
-            -- Debuff multipliers by evolution
-            local debuff_mult = 0.75
-            if evolution == 1 then debuff_mult = 0.70
-            elseif evolution == 2 then debuff_mult = 0.65
-            elseif evolution >= 3 then debuff_mult = 0.60 end
-            
-            -- Apply debuff to non-immune cards
             if not is_black or evolution == 0 then
-                if ret > 0 then
-                    ret = ret * debuff_mult
-                end
+                if ret > 0 then ret = ret * debuff_mult end
             end
             
-            -- Black card chip bonuses at higher evolutions
             if is_black and evolution >= 2 then
-                local chip_bonus = evolution == 2 and 5 or 10
+                local chip_bonus = (evolution == 2 and 5) or 10
                 ret = ret + chip_bonus
             end
         end
@@ -1856,114 +1784,74 @@ Card.get_chip_bonus = function(self)
         -- Phase 4: Waning Moon (Red Cards - Debuff with Immunity/Bonuses)
         if phase == 4 then
             local is_red = self:is_suit("Hearts") or self:is_suit("Diamonds")
+            local debuff_mult = ({0.75, 0.70, 0.65, 0.60})[evolution + 1] or 0.60
             
-            -- Debuff multipliers by evolution
-            local debuff_mult = 0.75
-            if evolution == 1 then debuff_mult = 0.70
-            elseif evolution == 2 then debuff_mult = 0.65
-            elseif evolution >= 3 then debuff_mult = 0.60 end
-            
-            -- Apply debuff to non-immune cards
             if not is_red or evolution == 0 then
-                if ret > 0 then
-                    ret = ret * debuff_mult
-                end
+                if ret > 0 then ret = ret * debuff_mult end
             end
             
-            -- Red card chip bonuses at higher evolutions
             if is_red and evolution >= 2 then
-                local chip_bonus = evolution == 2 and 5 or 10
+                local chip_bonus = (evolution == 2 and 5) or 10
                 ret = ret + chip_bonus
             end
         end
+        -- Fase 5 (Eclipse) manejada por editions.lua
     end
     return ret
 end
 
--- Hook Card:get_chip_mult (All Phases: Evolution-Based Mult Bonuses)
-local old_get_chip_mult = Card.get_chip_mult or function(self) return 0 end
+-- 2. Hook para Multiplicadores (Mult)
+local old_get_chip_mult_safe = Card.get_chip_mult
+
 Card.get_chip_mult = function(self)
-    local ret = old_get_chip_mult(self)
+    local ret = 0
+    if old_get_chip_mult_safe then
+        ret = old_get_chip_mult_safe(self)
+    end
     
     local key = get_deck_key()
     if key == 'lunar' then
-        -- Only apply to cards with Lunar edition
-        -- Note: If we use config AND this hook, we get double bonuses.
-        -- BUT user says "broken", so maybe config failed or is silent.
-        -- We will use this hook for VISUALS and Effect.
-        -- I RECOMMEND removing config from editions.lua later if this works.
-        
-        if not has_lunar_edition(self) then return ret end
-        
+        -- FILTRO DE SEGURIDAD: Solo aplica si la carta está en la mesa de juego
+        if self.area ~= G.play then return ret end
+
         local phase, evolution = get_odyssey_lunar_phase()
         evolution = tonumber(evolution) or 0
         local is_black = self:is_suit("Clubs") or self:is_suit("Spades")
         local is_red = self:is_suit("Hearts") or self:is_suit("Diamonds")
         
-        -- Phase 1: New Moon (Black Cards - Debuff with Immunity/Bonuses)
         if phase == 1 then
-             local mod = 1
-             if evolution == 0 then mod = 0.75
-             elseif evolution == 1 then mod = 0.70
-             elseif evolution == 2 then mod = 0.65
-             else mod = 0.60 end
-             
+             local mod = ({0.75, 0.70, 0.65, 0.60})[evolution + 1] or 0.60
              local immune = (is_black and evolution >= 1)
              if not immune and ret > 0 then ret = ret * mod end
-             
              if immune then
-                 local bonus = 0
-                 if evolution == 2 then bonus = 5
-                 elseif evolution >= 3 then bonus = 10 end
-                 if bonus > 0 then ret = ret + bonus end
+                 local bonus = (evolution == 2 and 5) or (evolution >= 3 and 10) or 0
+                 ret = ret + bonus
              end
-        end
-        
-        -- Phase 2: Waxing (All Cards Mult)
-        if phase == 2 then
-            local bonus = 2
-            if evolution == 1 then bonus = 4
-            elseif evolution == 2 then bonus = 6
-            elseif evolution >= 3 then bonus = 9 end
-            
-            -- We just return value here, popups are hard in get_chip_mult
+        elseif phase == 2 then
+            local bonus = ({2, 4, 6, 9})[evolution + 1] or 9
             ret = ret + bonus
-        end
-        
-        -- Phase 4: Waning (Red Cards - Debuff with Immunity/Bonuses)
-        if phase == 4 then
-             local mod = 1
-             if evolution == 0 then mod = 0.75
-             elseif evolution == 1 then mod = 0.70
-             elseif evolution == 2 then mod = 0.65
-             else mod = 0.60 end
-             
+        elseif phase == 4 then
+             local mod = ({0.75, 0.70, 0.65, 0.60})[evolution + 1] or 0.60
              local immune = (is_red and evolution >= 1)
              if not immune and ret > 0 then ret = ret * mod end
-             
              if immune then
-                 local bonus = 0
-                 if evolution == 2 then bonus = 5
-                 elseif evolution >= 3 then bonus = 10 end
-                 if bonus > 0 then ret = ret + bonus end
+                 local bonus = (evolution == 2 and 5) or (evolution >= 3 and 10) or 0
+                 ret = ret + bonus
              end
-        end
-        
-        -- Phase 5: Eclipse (All Cards +15 Mult)
-        if phase == 5 then
-            ret = ret + 15
         end
     end
     return ret
 end
 
--- Re-Add Card.calculate_joker for XMult (Phase 3 & 5) Visuals
--- Card.calculate_joker hook removed as XMult is now properly handled by SMODS.Edition config in editions.lua
-
-----------------------------------------------
--- COSMIC PARTICLE SYSTEMS (AURA & RUNES)
-----------------------------------------------
-print("DEBUG: Defining Card:update hook for Particles")
-----------------------------------------------
--- SHADER UNIFORM INJECTION HOOK (BRUTE FORCE - CORRECTED)
-----------------------------------------------
+local old_card_update = Card.update
+function Card.update(self, dt) -- Usamos punto (.) para control total de parámetros
+    old_card_update(self, dt)
+    
+    -- Solo procesar si el juego está en una partida activa
+    if not G.STAGE or G.STAGE ~= G.STAGES.RUN then return end
+    
+    -- Inyectar efectos visuales de LunarEffects si la carta tiene edición
+    if self.edition and LunarEffects then
+        LunarEffects:update(self, dt)
+    end
+end
