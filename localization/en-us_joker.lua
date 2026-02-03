@@ -4749,7 +4749,7 @@ j_odyssey_j_professions_student = {
         "{C:inactive}(Round {C:attention}#3#{C:inactive}/10){}",
         "Graduates to {X:mult,C:white} X2 {} Mult",
         "after {C:attention}10{} rounds"
-    }
+}
 },
  j_odyssey_j_professions_surgeon = {
  name = "Surgeon",
@@ -6821,6 +6821,7 @@ j_odyssey_j_professions_student = {
  text = {
  "If only 1 Life (Hand) remaining, {C:attention}X5 {}{C:mult}Mult{} Mult{}.{}"
   },
+  },
   
   j_odyssey_j_tribal_high_priestess = {
   name = "The High Priestess",
@@ -7019,6 +7020,5 @@ j_odyssey_j_professions_student = {
  },
  
  
- },
-
+}
 }
