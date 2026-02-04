@@ -2580,7 +2580,7 @@ return {
  j_odyssey_j_final_infinity = {
  name = "Infinito",
  text = {
- "{C:mult}+1 Multi para cada carta{}", "jogada nesta partida."
+ "{C:mult}+1 Multi para cada carta{}", "jogada nesta partida.", "{C:inactive}(Atualmente {}{C:mult}+#1#{} Multi{}{C:inactive}){}"
  }
  },
  

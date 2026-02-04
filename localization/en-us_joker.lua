@@ -57,10 +57,10 @@ return {
  },
  
  j_odyssey_j_anomaly_deadlock = {
- name = "Deadlock",
- text = {
- "{X:mult,C:white} X#1# {} Mult if you have{}", "{C:attention}0 Discards{} and {}{C:attention}0 Hands{} left{}"
- }
+  name = "Deadlock",
+  text = {
+  "{X:mult,C:white} X#1# {} Mult if you have{}", "{C:attention}0 Discards{} and {}{C:attention}0 Hands{} left{}"
+  }
  },
  
  j_odyssey_j_anomaly_diamond_anomaly = {
@@ -2474,7 +2474,7 @@ return {
  j_odyssey_j_final_chakra = {
  name = "Chakra",
  text = {
- "{C:mult}+10{} Mult for each {}{C:attention}Consumable slot{}", "(empty or full)."
+  "{C:mult}+10{} Mult for each {}{C:attention}Consumable slot{}", "(empty or full).", "{C:inactive}(Currently {C:mult}+#2#{} Mult){}"
  }
  },
  
@@ -2502,7 +2502,7 @@ return {
  j_odyssey_j_final_chi = {
  name = "Chi",
  text = {
- "Gains {C:chips}+10{} Chips permanently for{}", "each {C:attention}hand remaining{} at the end of round.{}"
+  "Gains {C:chips}+10{} Chips permanently for{}", "each {C:attention}hand remaining{} at the end of round.{}", "{C:inactive}(Currently {C:chips}+#1#{} Chips){}"
  }
  },
  
@@ -2578,9 +2578,9 @@ return {
  
  j_odyssey_j_final_infinity = {
  name = "Infinity",
- text = {
- "{C:mult}+1{} Mult for each card{}", "played this run."
- }
+  text = {
+  "{C:mult}+1{} Mult for each card{}", "played this run.", "{C:inactive}(Currently {}{C:mult}+#1#{} Mult{}{C:inactive}){}"
+  }
  },
  
  j_odyssey_j_final_karma = {
@@ -2677,7 +2677,7 @@ return {
  j_odyssey_j_final_plot_twist = {
  name = "Plot Twist",
  text = {
- "{C:mult}+10{} Mult. {}{C:green}1 in 4{} chance to double{}", "this Joker's {C:mult}Mult{} Mult permanently.{}"
+  "{C:mult}+10{} Mult. {}{C:green}1 in 4{} chance to double{}", "this Joker's {C:mult}Mult{} permanently.{}", "{C:inactive}(Currently {C:mult}+#1#{} Mult){}"
  }
  },
  
@@ -2717,10 +2717,10 @@ return {
  },
  
  j_odyssey_j_final_tao = {
- name = "Tao",
- text = {
- "{X:mult,C:white} X2 {} Mult if your deck has an{}", "{C:attention}equal number{} of Red and Black cards.{}"
- }
+  name = "Tao",
+  text = {
+  "{X:mult,C:white} X#1# {} Mult if your deck has an{}", "{C:attention}equal number{} of Red and Black cards.{}", "{C:inactive}(Current: #2# Red, #3# Black){}"
+  }
  },
  
  j_odyssey_j_final_the_beginning = {
@@ -2775,14 +2775,14 @@ return {
  j_odyssey_j_final_yang = {
  name = "Yang",
  text = {
- "{C:mult}+20{} Mult for {}{C:attention}Red{} cards.{}", "{X:mult,C:white} X2 {} Mult if you have {}{C:attention}Yin{}.{}"
+  "{C:mult}+20{} Mult for {}{C:attention}Red{} cards.{}", "{X:mult,C:white} X2 {} Mult if you have {}{C:attention}Yin{}.{}", "{C:inactive}(Status: Yin #3#){}"
  }
  },
  
  j_odyssey_j_final_yin = {
  name = "Yin",
  text = {
- "{C:mult}+20{} Mult for {}{C:attention}Black{} cards.{}", "{X:mult,C:white} X2 {} Mult if you have {}{C:attention}Yang{}.{}"
+  "{C:mult}+20{} Mult for {}{C:attention}Black{} cards.{}", "{X:mult,C:white} X2 {} Mult if you have {}{C:attention}Yang{}.{}", "{C:inactive}(Status: Yang #3#){}"
  }
  },
  
@@ -2796,7 +2796,7 @@ return {
  j_odyssey_j_final_zen = {
  name = "Zen",
  text = {
- "{C:mult}+30{} Mult if you do not play{}", "any hand for {C:attention}10 seconds{} in real time.{}"
+  "{C:mult}+30{} Mult if you do not play{}", "any hand for {C:attention}10 seconds{} in real time.{}", "{C:inactive}(Status: #3#){}"
  }
  },
  

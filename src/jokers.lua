@@ -16157,7 +16157,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local only_diamonds = true
@@ -16315,7 +16326,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and context.scoring_name == "Flush" then
             local hearts = true
@@ -16343,7 +16365,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and context.scoring_name == "Flush" then
             local spades = true
@@ -16371,7 +16404,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and context.scoring_name == "Flush" then
             local diamonds = true
@@ -16399,7 +16443,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and context.scoring_name == "Flush" then
             local clubs = true
@@ -16427,7 +16482,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local suits = {Hearts=false, Spades=false, Diamonds=false, Clubs=false}
@@ -16618,7 +16684,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             if context.other_card.edition and context.other_card.edition.polychrome then
@@ -16670,7 +16747,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             if context.other_card:is_suit("Hearts") or context.other_card:is_suit("Spades") then
@@ -16733,7 +16821,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.before and context.scoring_name == "Straight Flush" then
             if #context.scoring_hand >= 3 then
@@ -16988,7 +17087,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local elements = { fire=false, water=false, earth=false, air=false }
@@ -17059,7 +17169,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             return {
@@ -17139,7 +17260,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and card.ability.extra.next_hand_active then
             card.ability.extra.next_hand_active = false
@@ -17174,7 +17306,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             return {
@@ -17201,7 +17344,18 @@ SMODS.Joker({
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             return {
@@ -31449,7 +31603,18 @@ SMODS.Joker({
     cost = 9,
     blueprint_compat = true,
     perishable_compat = false,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             return {
@@ -31611,7 +31776,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 10,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     add_to_deck = function(self, card)
         card.ability.eternal = true
         card.ability.sell_cost = 0
@@ -31832,7 +32008,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 4,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and G.GAME.current_round.hands_left == 3 then
             return {
@@ -31996,7 +32183,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             if (G.GAME.last_hand_sampling.flush or G.GAME.last_hand_sampling.straight) then
@@ -32056,7 +32254,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and #G.jokers.cards <= 1 then
             return {
@@ -32078,7 +32287,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     add_to_deck = function(self, card)
         G.GAME.round_resets.hands = G.GAME.round_resets.hands - 1
         ease_hands_left(-1)
@@ -32170,7 +32390,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and G.GAME.chips < G.GAME.blind.chips then
             return {
@@ -32192,7 +32423,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             if context.other_card:is_suit('Hearts') then
@@ -32216,7 +32458,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             if context.other_card:is_suit('Spades') then
@@ -32240,7 +32493,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and G.GAME.current_round.discards_used == 0 then
             return {
@@ -32285,7 +32549,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 8,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             if #G.hand.cards > 0 and not context.blueprint then
@@ -32404,7 +32679,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 10,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and #G.hand.cards == 0 then
             return {
@@ -32454,7 +32740,14 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 7,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).mult, (( (card and card.ability and card.ability.extra) or self.config.extra )).timer } } end,
+    loc_vars = function(self, info_queue, card) 
+        local now = G.TIMERS.REAL
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        local time_diff = now - (card.ability.extra.last_hand_time or now)
+        local time_left = math.max(0, extra.timer - time_diff)
+        local status = time_left <= 0 and "Ready!" or string.format("Wait %.1fs", time_left)
+        return { vars = { extra.mult, extra.timer, status } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local now = G.TIMERS.REAL
@@ -32482,7 +32775,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 8,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local reds = 0
@@ -32512,7 +32816,16 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).mult, (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local has_yang = false
+        if G.jokers then
+            for k, v in ipairs(G.jokers.cards) do
+                if v.config.center.key == 'j_odyssey_j_final_yang' then has_yang = true; break end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.mult, extra.x_mult, has_yang and "Active" or "Inactive" } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local has_yang = false
@@ -32528,7 +32841,7 @@ SMODS.Joker({
             if spades_clubs > 0 then
                 local ret = { mult_mod = spades_clubs * card.ability.extra.mult }
                 if has_yang then
-                    ret.x_mult = card.ability.extra.x_mult
+                    ret.Xmult_mod = card.ability.extra.x_mult
                 end
                 return ret
             end
@@ -32547,7 +32860,16 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).mult, (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local has_yin = false
+        if G.jokers then
+            for k, v in ipairs(G.jokers.cards) do
+                if v.config.center.key == 'j_odyssey_j_final_yin' then has_yin = true; break end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.mult, extra.x_mult, has_yin and "Active" or "Inactive" } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local has_yin = false
@@ -32563,7 +32885,7 @@ SMODS.Joker({
             if hearts_diamonds > 0 then
                 local ret = { mult_mod = hearts_diamonds * card.ability.extra.mult }
                 if has_yin then
-                    ret.x_mult = card.ability.extra.x_mult
+                    ret.Xmult_mod = card.ability.extra.x_mult
                 end
                 return ret
             end
@@ -32642,7 +32964,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 6,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local suits = {}
@@ -32705,7 +33038,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 9,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main and G.GAME.current_round.discards_used == 0 then
             return {
@@ -32840,7 +33184,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 15,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             return {
@@ -32867,7 +33222,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 15,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             return {
@@ -32889,7 +33255,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 15,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local bonus = card.ability.extra.x_mult
@@ -32915,7 +33292,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 20,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             return {
@@ -32937,7 +33325,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 15,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             if G.GAME.blind and not G.GAME.blind.reveal_boss then 
@@ -33013,7 +33412,18 @@ SMODS.Joker({
     pos = { x = 0, y = 0 },
     cost = 15,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             return {
@@ -33040,12 +33450,12 @@ SMODS.Joker({
     cost = 20,
     blueprint_compat = true,
     loc_vars = function(self, info_queue, card) 
-        local bonus = G.GAME.hands_played or 0
+        local bonus = G.GAME.odyssey_total_cards_played or 0
         return { vars = { bonus } } 
     end,
     calculate = function(self, card, context)
         if context.joker_main then
-            local bonus = G.GAME.hands_played or 0
+            local bonus = G.GAME.odyssey_total_cards_played or 0
             return {
                 mult_mod = bonus,
                 message = localize{ type = 'variable', key = 'a_mult', vars = { bonus } }
@@ -33069,7 +33479,7 @@ SMODS.Joker({
     calculate = function(self, card, context)
         if context.joker_main then
             return {
-                x_mult = card.ability.extra.x_mult,
+                Xmult_mod = card.ability.extra.x_mult,
                 mult_mod = card.ability.extra.min_mult,
                 message = "ABSOLUTE"
             }
@@ -33092,7 +33502,18 @@ SMODS.Joker({
     soul_pos = { x = 0, y = 0 },
     cost = 20,
     blueprint_compat = true,
-    loc_vars = function(self, info_queue, card) return { vars = { (( (card and card.ability and card.ability.extra) or self.config.extra )).x_mult } } end,
+    loc_vars = function(self, info_queue, card) 
+        local reds = 0
+        local blacks = 0
+        if G.playing_cards then
+            for k, v in ipairs(G.playing_cards) do
+                if v:is_suit('Hearts') or v:is_suit('Diamonds') then reds = reds + 1
+                else blacks = blacks + 1 end
+            end
+        end
+        local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
+        return { vars = { extra.x_mult, reds, blacks } } 
+    end,
     calculate = function(self, card, context)
         if context.setting_blind and not context.blueprint then
             for k, v in ipairs(G.jokers.cards) do
@@ -33101,7 +33522,7 @@ SMODS.Joker({
         end
         if context.joker_main then
             return {
-                x_mult = card.ability.extra.x_mult,
+                Xmult_mod = card.ability.extra.x_mult,
                 message = localize{ type = 'variable', key = 'a_xmult', vars = { card.ability.extra.x_mult } }
             }
         end
@@ -33134,7 +33555,7 @@ SMODS.Joker({
             end
             if count > 0 then
                 return {
-                    x_mult = count,
+                    Xmult_mod = count,
                     message = "X" .. count,
                     colour = G.C.MULT
                 }

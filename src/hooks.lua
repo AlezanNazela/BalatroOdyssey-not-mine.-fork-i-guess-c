@@ -290,6 +290,9 @@ G.FUNCS.play_cards = function(e)
     if deck_key == 'timeline' then
         G.GAME.odyssey_temp_chips = G.GAME.chips
     end
+
+    -- ODYSSEY: Track total cards played this run
+    G.GAME.odyssey_total_cards_played = (G.GAME.odyssey_total_cards_played or 0) + #G.hand.highlighted
     
     -- 41. Wrath (Ira): Hand gives $1
     if deck_key == 'wrath' then
