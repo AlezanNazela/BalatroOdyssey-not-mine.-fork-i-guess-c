@@ -356,6 +356,16 @@ SMODS.current_mod.calculate = function(self, context)
             x_mult = x_mult * 1.5
         end
 
+        -- ASYNC JOKER PHASE: Trigger all jokers with odyssey_async context
+        -- This ensures they always trigger after standard scoring calculation
+        for _, j in ipairs(G.jokers.cards) do
+            local async_ret = j:calculate_joker({joker_main = true, odyssey_async = true})
+            if async_ret then
+                if async_ret.mult then mult = mult + async_ret.mult end
+                -- Potentially add other stats if we expand Async in the future
+            end
+        end
+
         if chips > 0 or mult > 0 or x_mult > 1 then
             return {
                 message = "Odyssey!",

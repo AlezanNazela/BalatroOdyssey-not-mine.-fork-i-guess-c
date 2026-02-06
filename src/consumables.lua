@@ -3,7 +3,7 @@ local tarot_max = {
     [4] = 2, [6] = 2, [7] = 1, [8] = 1, [9] = 1, [12] = 2, [13] = 2, [14] = 2,
     [16] = 1, [17] = 1, [18] = 3, [19] = 3, [20] = 3, [22] = 3, [25] = 3, [26] = 2, [27] = 3,
     [35] = 2, [36] = 2, [37] = 1, [38] = 1, [44] = 1, [45] = 1, [59] = 3, [69] = 1,
-    [84] = 1, [85] = 1, [86] = 1, [87] = 1, [88] = 1, [89] = 1, [90] = 1, [91] = 1, [92] = 1, [93] = 1, [94] = 1, [95] = 1, [96] = 2,
+    [84] = 1, [85] = 1, [86] = 1, [87] = 1, [88] = 1, [89] = 2, [90] = 1, [91] = 2, [92] = 2, [93] = 2, [94] = 2, [95] = 2, [96] = 2,
     [97] = 1, [98] = 1, [99] = 1, [100] = 1
 }
 
@@ -443,7 +443,9 @@ for _, t in ipairs(tarots) do
                 G.jokers:emplace(_card)
             elseif id == 67 then -- Merchant
                 G.E_MANAGER:add_event(Event({trigger = 'immediate', func = function()
+                    G.GAME.current_round.free_rerolls = (G.GAME.current_round.free_rerolls or 0) + 1
                     G.FUNCS.reroll_shop()
+                    card_eval_status_text(card, 'extra', nil, nil, nil, {message = "Free!", colour = G.C.GREEN})
                     return true
                 end}))
             elseif id == 68 then -- Thief
@@ -693,6 +695,12 @@ for _, p in ipairs(planets) do
         discovered = true,
         set = "Planet",
         cost = 3,
+        in_pool = function(self)
+            if p.key == 'planet_9' and G.GAME.odyssey_pluto_removed then
+                return false
+            end
+            return true
+        end,
         loc_vars = function(self, info_queue, card)
 
             local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
@@ -1007,6 +1015,11 @@ local spectral_logic = {
         end
         ease_dollars(50)
     end,
+    [28] = function(card, area, copier) -- Strings
+        G.GAME.odyssey_string_theory_permanent = true
+        G.GAME.starting_params.hand_size = (G.GAME.starting_params.hand_size or 8) - 2
+        G.hand:change_size(-2)
+    end,
     [29] = function(card, area, copier) -- Caos
         local editions = {nil, {foil = true}, {holo = true}, {polychrome = true}, {negative = true}}
         for i=1, #G.jokers.cards do
@@ -1074,6 +1087,20 @@ local spectral_logic = {
             end
         end
         ease_dollars(count)
+    end,
+    [44] = function(card, area, copier) -- Tyson
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            for k, v in pairs(G.GAME.hands) do
+                if k ~= 'High Card' then
+                    level_up_hand(card, k, nil, 1)
+                end
+            end
+            G.GAME.odyssey_pluto_removed = true
+            return true
+        end }))
+    end,
+    [45] = function(card, area, copier) -- Kaku
+        G.GAME.odyssey_string_theory_permanent = true
     end,
     [46] = function(card, area, copier) -- Greene
         local card = create_card('Joker', G.jokers, nil, 0.9, nil, nil, nil, 'greene')

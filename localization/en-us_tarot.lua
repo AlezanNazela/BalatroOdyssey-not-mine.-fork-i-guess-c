@@ -512,7 +512,7 @@ return {
  c_odyssey_tarot_67 = {
  name = "The Merchant",
  text = {
- "Rerolls the shop."
+ "Rerolls the shop for free."
  
  }
  },

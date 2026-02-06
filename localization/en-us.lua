@@ -30,14 +30,9 @@ end
 local joker = load_module('en-us_joker')
 if joker and joker.Joker then result.descriptions['Joker'] = joker['Joker'] end
 
-result.descriptions['Tarot'] = {}
-local tarot1 = load_module('en-us_tarot_1')
-if tarot1 and tarot1.Tarot then 
-    for k, v in pairs(tarot1.Tarot) do result.descriptions['Tarot'][k] = v end
-end
-local tarot2 = load_module('en-us_tarot_2')
-if tarot2 and tarot2.Tarot then 
-    for k, v in pairs(tarot2.Tarot) do result.descriptions['Tarot'][k] = v end
+local tarot = load_module('en-us_tarot')
+if tarot and tarot.Tarot then 
+    for k, v in pairs(tarot.Tarot) do result.descriptions['Tarot'][k] = v end
 end
 
 local planet = load_module('en-us_planet')

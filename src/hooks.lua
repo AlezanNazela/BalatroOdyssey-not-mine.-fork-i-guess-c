@@ -587,7 +587,7 @@ end
 local old_find_joker = find_joker
 function find_joker(key)
     local ret = old_find_joker(key)
-    if key == 'Shortcut' and get_deck_key() == 'string_theory' then
+    if key == 'Shortcut' and (get_deck_key() == 'string_theory' or G.GAME.odyssey_string_theory_permanent) then
         if not next(ret) then
             table.insert(ret, { ability = {} }) -- Dummy card object
         end
@@ -1857,4 +1857,22 @@ function Card.update(self, dt) -- Usamos punto (.) para control total de paráme
     if self.edition and LunarEffects then
         LunarEffects:update(self, dt)
     end
+
+-- 17. Hand Evaluation Hook (For Dimensional Merge)
+-- Used to upgrade 'Two Pair' to 'Four of a Kind' if joker is present
+local old_get_poker_hand_info = G.FUNCS.get_poker_hand_info
+G.FUNCS.get_poker_hand_info = function(_cards)
+    local text, loc_text, disp_text, poker_hands, scoring_hand, disp_scoring_hand = old_get_poker_hand_info(_cards)
+
+    if text == 'Two Pair' and next(find_joker('j_dimensions_merge')) then
+        text = 'Four of a Kind'
+        -- Fetch correct localized name for Four of a Kind
+        if G.localization and G.localization.misc and G.localization.misc.poker_hands and G.localization.misc.poker_hands['Four of a Kind'] then
+             loc_text = G.localization.misc.poker_hands['Four of a Kind']
+        else
+             loc_text = "Four of a Kind"
+        end
+    end
+
+    return text, loc_text, disp_text, poker_hands, scoring_hand, disp_scoring_hand
 end

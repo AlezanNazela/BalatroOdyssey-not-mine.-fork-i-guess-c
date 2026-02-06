@@ -857,7 +857,7 @@ return {
  j_odyssey_j_cond_async = {
  name = "Async",
  text = {
- "This Joker triggers AFTER all scoring is calculated."
+  " {C:mult}+20{} Mult. This Joker always triggers", "{C:attention}last{}, regardless of its position."
  }
  },
  
@@ -4115,7 +4115,7 @@ return {
  j_odyssey_j_pos_bishop = {
  name = "Bishop",
  text = {
- "Affects Jokers in slots of", "the same parity (1, 3, 5)."
+  "{X:mult,C:white} X#1# {} Mult if this Joker is in an", "{C:attention}odd-numbered{} slot (1, 3, 5)."
  }
  },
  
@@ -4241,14 +4241,14 @@ return {
  j_odyssey_j_pos_king = {
  name = "King",
  text = {
- "All Jokers must be adjacent to", "this one to function."
+  "{X:mult,C:white} X#1# {} Mult if this", "Joker has {C:attention}2 neighbors{}."
  }
  },
  
  j_odyssey_j_pos_knight = {
  name = "Knight",
  text = {
- "Skips a slot to affect the next one."
+  "{C:mult}+#1# Mult.{}"
  }
  },
  
@@ -4318,7 +4318,7 @@ return {
  j_odyssey_j_pos_pawn = {
  name = "Pawn",
  text = {
- "If it reaches the last slot,", "becomes {C:attention}Queen{} ({}{X:mult,C:white} X3 {} Mult).{}"
+  "Starts on the far left. Moves 1 slot", "right every hand. {C:attention}Pinned{}.", "{X:mult,C:white} X#1# {} Mult if in the last slot."
  }
  },
  
@@ -4346,7 +4346,7 @@ return {
  j_odyssey_j_pos_queen = {
  name = "Queen",
  text = {
- "{X:mult,C:white} X#1# {} Multi"
+  "{X:mult,C:white} X#1# {} Mult"
  }
  },
  j_odyssey_j_pos_repulsor = {
@@ -4366,7 +4366,7 @@ return {
  j_odyssey_j_pos_rook = {
  name = "Rook",
  text = {
- "Can swap places with any Joker."
+  "{C:mult}+#1#{} Mult. Gives {X:mult,C:white} X2 {} Mult", "instead if {C:attention}King{} is present."
  }
  },
  
@@ -7020,5 +7020,245 @@ j_odyssey_j_professions_student = {
  },
  
  
+    j_odyssey_j_dimensions_accumulation = {
+        name = "Accumulation",
+        text = {
+            "Gain {C:mult}+1{} Mult permanently", "for every {C:attention}2 cards{} played", "{C:inactive}(Currently {}{C:mult}+#1#{}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_ante_start = {
+        name = "Ante Start",
+        text = {
+            "{X:mult,C:white} X1.5 {} Mult", "on the {C:attention}first round{}", "of each Ante"
+        }
+    },
+    j_odyssey_j_dimensions_best_play = {
+        name = "Best Play",
+        text = {
+            "Stores {C:mult}Mult{} and {C:chips}Chips{}", "from the {C:attention}best hand{} of the round", "Applies at end", "{C:inactive}(Best: {}{C:mult}+#1#{}{C:inactive} Mult {}{C:chips}+#2#{}{C:inactive} Chips){}"
+        }
+    },
+    j_odyssey_j_dimensions_big_luck = {
+        name = "Big Luck",
+        text = {
+            "{C:green}#1# in #2#{} chance to", "not consume a hand", "when played"
+        }
+    },
+    j_odyssey_j_dimensions_blind_watcher = {
+        name = "Blind Watcher",
+        text = {
+            "When a {C:attention}Blind{} is selected,{}", "gain {C:mult}+10{} Mult permanently", "{C:inactive}(Currently {}{C:mult}+#1#{}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_boss_fighter = {
+        name = "Boss Fighter",
+        text = {
+            "{X:mult,C:white} X2 {} Mult on", "{C:attention}Boss Blind{}", "{C:mult}+15{} Mult otherwise"
+        }
+    },
+    j_odyssey_j_dimensions_chaotic = {
+        name = "Chaotic",
+        text = {
+            "At end of round,", "{C:green}50% chance{} to", "double or zero {C:mult}Mult{}", "{C:inactive}(Currently {}{C:mult}+#1#{}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_collapse = {
+        name = "Dimensional Collapse",
+        text = {
+            "When {C:attention}Boss Blind{} is selected,{}", "{C:red}destroy{} a random Joker to{}", "gain {X:mult,C:white} X3 {} Mult for the rest of Ante", "{C:inactive}(Active: #1#){}"
+        }
+    },
+    j_odyssey_j_dimensions_cumulative = {
+        name = "Cumulative",
+        text = {
+            "Gains {X:mult,C:white} X#2# {} Mult for", "each {C:attention}Blind{} defeated", "{C:inactive}(Currently {}{X:mult,C:white} X#1# {}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_double_processing = {
+        name = "Double Processing",
+        text = {
+            "All played cards", "score {C:attention}twice{}", "{C:red}Lose {}{C:money}$#1#{} per round"
+        }
+    },
+    j_odyssey_j_dimensions_fast_burn = {
+        name = "Fast Burn",
+        text = {
+            "{X:mult,C:white} X2 {} Mult, but loses", "{X:mult,C:white} X0.2 {} Mult every round", "{C:inactive}(Min {}{X:mult,C:white} X1 {} {}{C:inactive}Mult){}", "{C:inactive}(Currently {}{X:mult,C:white} X#1# {} {}{C:inactive}Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_final_sacrifice = {
+        name = "Final Sacrifice",
+        text = {
+            "Every time a", "{C:attention}Joker{} is sold,{}", "this Joker gains", "{X:mult,C:white} X0.1 {} Mult permanently", "{C:inactive}(Currently {}{X:mult,C:white} X#1# {}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_first_card = {
+        name = "First Card",
+        text = {
+            "First card played", "in each hand gains", "{C:chips}+50{} Chips"
+        }
+    },
+    j_odyssey_j_dimensions_first_three = {
+        name = "First Three",
+        text = {
+            "First {C:attention}3 hands{}", "of the round gain", "{C:mult}+15{} Mult"
+        }
+    },
+    j_odyssey_j_dimensions_hidden_treasure = {
+        name = "Hidden Treasure",
+        text = {
+            "If you use no", "{C:attention}discards{} in round,{}", "gain {C:money}$#1#{}"
+        }
+    },
+    j_odyssey_j_dimensions_infinite_growth = {
+        name = "Infinite Growth",
+        text = {
+            "Gains {X:mult,C:white} X#2# {} Mult", "every round won", "{C:inactive}(Currently {}{X:mult,C:white} X#1# {}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_last_card = {
+        name = "Last Card",
+        text = {
+            "Last card played", "in each hand gains", "{C:mult}+20{} Mult"
+        }
+    },
+    j_odyssey_j_dimensions_last_hour = {
+        name = "Last Hour",
+        text = {
+            "On the {C:attention}last hand{}", "of the round, gain", "{X:mult,C:white} X1.5 {} Mult"
+        }
+    },
+    j_odyssey_j_dimensions_last_three = {
+        name = "Last Three",
+        text = {
+            "Last {C:attention}3 hands{}", "of the round gain", "{C:mult}+20{} Mult"
+        }
+    },
+    j_odyssey_j_dimensions_learning = {
+        name = "Learning",
+        text = {
+            "Gain {C:mult}+5{} Mult permanently", "if you don't win or lose", "on the first hand", "{C:inactive}(Currently {}{C:mult}+#1#{}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_legacy = {
+        name = "Legacy",
+        text = {
+            "{C:mult}+5{} Mult for each", "{C:attention}Joker{} sold this run", "{C:inactive}(Currently {}{C:mult}+#1#{}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_linear_scaling = {
+        name = "Linear Scaling",
+        text = {
+            "{X:mult,C:white} X0.2 {} Mult for", "each {C:attention}Ante{} completed", "{C:inactive}(Currently {}{X:mult,C:white} X#1# {} {}{C:inactive}Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_lord = {
+        name = "Dimensional Lord",
+        text = {
+            "{X:mult,C:white} X0.5 {} Mult for each", "{C:attention}empty Joker slot{}", "{C:inactive}(Currently {}{X:mult,C:white} X#1# {}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_lucky_number = {
+        name = "Lucky Number",
+        text = {
+            "If holding {C:attention}exactly 4{}", "cards in hand at end of round,", "gain {X:mult,C:white} X2 {} Mult"
+        }
+    },
+    j_odyssey_j_dimensions_master_of_space = {
+        name = "Master of Space",
+        text = {
+            "All played cards", "count as {C:attention}Wild Cards{}", "{C:inactive}(Any suit){}"
+        }
+    },
+    j_odyssey_j_dimensions_memory = {
+        name = "Memory",
+        text = {
+            "{C:attention}Discarded cards{}", "give {C:mult}+2{} Mult when", "played this round", "{C:inactive}(Resets every round){}"
+        }
+    },
+    j_odyssey_j_dimensions_merge = {
+        name = "Dimensional Merge",
+        text = {
+            "If played hand contains", "exactly {C:attention}2 Pairs{}, {}", "it scores as {C:attention}4 of a Kind{}"
+        }
+    },
+    j_odyssey_j_dimensions_momentum = {
+        name = "Momentum",
+        text = {
+            "Each scored card", "increases {C:mult}Mult by +3{}", "during the hand"
+        }
+    },
+    j_odyssey_j_dimensions_multiverse_navigator = {
+        name = "Multiverse Navigator",
+        text = {
+            "If you play a {C:attention}Flush{}, {}", "create a random {C:tarot}Tarot{}", "card {C:inactive}(Must have space){}"
+        }
+    },
+    j_odyssey_j_dimensions_omnidimensional = {
+        name = "Omnidimensional",
+        text = {
+            "{X:mult,C:white} X5 {} Mult.{}", "{C:attention}-1{} Ante when acquired", "{C:inactive}(Extends the run){}"
+        }
+    },
+    j_odyssey_j_dimensions_omnipresent = {
+        name = "Omnipresent",
+        text = {
+            "Retrigger all cards", "played {C:attention}1 time{}"
+        }
+    },
+    j_odyssey_j_dimensions_pocket_universe = {
+        name = "Pocket Universe",
+        text = {
+            "Create a random {C:planet}Planet{}", "card when you {C:attention}sell{}", "a Joker"
+        }
+    },
+    j_odyssey_j_dimensions_random_bonus = {
+        name = "Random Bonus",
+        text = {
+            "When discarding, {C:green}15% chance{}", "to gain {C:money}${} or{}", "{C:attention}+1 Discard{}"
+        }
+    },
+    j_odyssey_j_dimensions_reality_breach = {
+        name = "Reality Breach",
+        text = {
+            "{C:red}Destroy{} all discarded cards.{}", "Gain {C:mult}+1{} Mult per destroyed card", "{C:inactive}(Resets after Boss){}", "{C:inactive}(Currently {}{C:mult}+#1#{}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_reverse_order = {
+        name = "Reverse Order",
+        text = {
+            "Cards played from", "right to left give", "{C:chips}+15{} Chips each"
+        }
+    },
+    j_odyssey_j_dimensions_sacrifice = {
+        name = "Sacrifice",
+        text = {
+            "{C:green}1 in 10{} chance to{}", "{C:attention}destroy{} a scored card{}", "and gain {X:mult,C:white} X1.5 {} Mult permanently"
+        }
+    },
+    j_odyssey_j_dimensions_streak = {
+        name = "Streak",
+        text = {
+            "{C:mult}+10{} Mult for each", "{C:attention}consecutive hand{} played", "without discarding", "{C:inactive}(Currently {}{C:mult}+#1#{}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_temporal_synergy = {
+        name = "Temporal Synergy",
+        text = {
+            "{C:mult}+3{} Mult for each", "{C:attention}Temporal Joker{}", "you own", "{C:inactive}(Currently {}{C:mult}+#1#{}{C:inactive} Mult){}"
+        }
+    },
+    j_odyssey_j_dimensions_transcendence = {
+        name = "Transcendence",
+        text = {
+            "{C:dark_edition}+1{} Joker Slot,{}", "but {C:attention}-1{} Hand Size"
+        }
+    },
+    j_odyssey_j_dimensions_ultimate_stability = {
+        name = "Ultimate Stability",
+        text = {
+            "Locks {C:attention}Hands{} and {}{C:attention}Discards{}", "to initial round value", "{C:mult}+20{} Mult"
+        }
+    }
 }
 }

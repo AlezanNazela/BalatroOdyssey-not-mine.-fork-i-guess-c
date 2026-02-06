@@ -30122,12 +30122,28 @@ SMODS.Joker({
     discovered = true,
     unlocked = true,
     key = 'j_pos_pawn',
-    config = { extra = { x_mult = 3 } },
+    config = { extra = { x_mult = 3 }, pinned = true },
     rarity = 2,
     atlas = 'j_pos_pawn',
     pos = { x = 0, y = 0 },
     cost = 5,
     blueprint_compat = true,
+    add_to_deck = function(self, card, from_debuff)
+        -- Move to the far left
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                local my_idx = nil
+                for i = 1, #G.jokers.cards do
+                    if G.jokers.cards[i] == card then my_idx = i; break end
+                end
+                if my_idx and my_idx > 1 then
+                    table.remove(G.jokers.cards, my_idx)
+                    table.insert(G.jokers.cards, 1, card)
+                end
+                return true
+            end
+        }))
+    end,
     loc_vars = function(self, info_queue, card)
 
         local extra = ( (card and card.ability and card.ability.extra) or self.config.extra )
@@ -30146,6 +30162,22 @@ SMODS.Joker({
                     colour = G.C.PURPLE
                 }
             end
+        end
+        if context.after and not context.blueprint then
+            -- Move one slot right
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    local my_idx = nil
+                    for i = 1, #G.jokers.cards do
+                        if G.jokers.cards[i] == card then my_idx = i; break end
+                    end
+                    if my_idx and my_idx < #G.jokers.cards then
+                        table.remove(G.jokers.cards, my_idx)
+                        table.insert(G.jokers.cards, my_idx + 1, card)
+                    end
+                    return true
+                end
+            }))
         end
     end
 })
@@ -31404,7 +31436,7 @@ SMODS.Joker({
     cost = 6,
     blueprint_compat = true,
     calculate = function(self, card, context)
-        if context.after then
+        if context.joker_main and context.odyssey_async then
             return {
                 mult = 20,
                 message = "ASYNC"

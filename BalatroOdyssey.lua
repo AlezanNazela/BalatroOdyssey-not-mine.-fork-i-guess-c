@@ -58,6 +58,10 @@ function Game:start_run(args)
     G.GAME.rogue_x_mult = G.GAME.rogue_x_mult or 1
     G.GAME.bard_retrigger = G.GAME.bard_retrigger or 0
     
+    -- Odyssey Permanent Effects
+    G.GAME.odyssey_pluto_removed = G.GAME.odyssey_pluto_removed or false
+    G.GAME.odyssey_string_theory_permanent = G.GAME.odyssey_string_theory_permanent or false
+    
     return ret
 end
 ----------------------------------------------

@@ -858,7 +858,7 @@ return {
  j_odyssey_j_cond_async = {
  name = "Assíncrono",
  text = {
- "Este Curinga ativa APÓS toda a pontuação ser calculada."
+  "{C:mult}+20{} Multi. Este Curinga sempre ativa por", "{C:attention}último{}, independentemente de sua posição."
  }
  },
  
@@ -4116,7 +4116,7 @@ return {
  j_odyssey_j_pos_bishop = {
  name = "Bispo",
  text = {
- "Afeta Curingas em posições de", "mesma paridade (1, 3, 5)."
+  "{X:mult,C:white} X#1# {} Multi se este Curinga estiver em", "um espaço de {C:attention}número ímpar{} (1, 3, 5)."
  }
  },
  
@@ -4242,14 +4242,14 @@ return {
  j_odyssey_j_pos_king = {
  name = "Rei",
  text = {
- "Todos os Curingas devem estar adjacentes", "a este para funcionar."
+  "{X:mult,C:white} X#1# {} Multi se este", "Curinga tiver {C:attention}2 vizinhos{}."
  }
  },
  
  j_odyssey_j_pos_knight = {
  name = "Cavalo",
  text = {
- "Pula um espaço para afetar o próximo."
+  "{C:mult}+#1# Multi.{}"
  }
  },
  
@@ -4319,7 +4319,7 @@ return {
  j_odyssey_j_pos_pawn = {
  name = "Peão",
  text = {
- "Se chegar à última posição,", "vira {C:attention}Rainha{} ({}{X:mult,C:white} X3 Multi).{}"
+  "Começa na extrema esquerda. Move-se 1", "espaço para a direita a cada mão.", "{C:attention}Preso{}. {X:mult,C:white} X#1# {} Multi se estiver na última posição."
  }
  },
  
@@ -4347,7 +4347,7 @@ return {
  j_odyssey_j_pos_queen = {
  name = "Rainha",
  text = {
- "{X:mult,C:white} X#1# {} Multi"
+  "{X:mult,C:white} X#1# {} Multi"
  }
  },
  j_odyssey_j_pos_repulsor = {
@@ -4367,7 +4367,7 @@ return {
  j_odyssey_j_pos_rook = {
  name = "Torre",
  text = {
- "Pode trocar de lugar com qualquer Curinga."
+  "{C:mult}+#1#{} Multi. Dá {X:mult,C:white} X2 {} Multi", "em vez disso se o {C:attention}Rei{} estiver presente."
  }
  },
  
@@ -7532,7 +7532,7 @@ return {
  c_odyssey_tarot_67 = {
  name = "O Mercador",
  text = {
- "Rerrola a Loja."
+ "Rerrola a Loja gratuitamente."
  
  }
  },
