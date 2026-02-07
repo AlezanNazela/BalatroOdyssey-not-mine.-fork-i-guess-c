@@ -22006,9 +22006,11 @@ SMODS.Joker({
     blueprint_compat = false,
     add_to_deck = function(self, card)
         G.GAME.odyssey_utopia_active = (G.GAME.odyssey_utopia_active or 0) + 1
+        for k, v in pairs(G.I.CARD) do if v.set_cost then v:set_cost() end end
     end,
     remove_from_deck = function(self, card)
         G.GAME.odyssey_utopia_active = (G.GAME.odyssey_utopia_active or 1) - 1
+        for k, v in pairs(G.I.CARD) do if v.set_cost then v:set_cost() end end
     end,
     calculate = function(self, card, context)
         if context.buy_card and not context.blueprint then
@@ -22386,15 +22388,8 @@ SMODS.Joker({
             if card.ability.extra.current <= 0 then
                 card.ability.extra.current = card.ability.extra.rounds
                 G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                    local key = 'p_arcana_normal_' .. (math.random(1, 2))
-                    local card = Card(G.play.T.x, G.play.T.y, G.CARD_W*1.27, G.CARD_H*1.27, G.P_CARDS.empty, G.P_CENTERS[key], {bypass_discovery_center = true, bypass_discovery_ui = true})
-                    card:set_edition(nil, true, true)
-                    card:draw_from_deck()
-                    G.play:emplace(card)
-                    G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                        card:use_booster_pack()
-                        return true
-                    end}))
+                    add_tag(Tag('tag_charm'))
+                    play_sound('generic1')
                     return true
                 end}))
                 return {

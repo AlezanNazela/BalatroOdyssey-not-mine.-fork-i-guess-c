@@ -44,6 +44,8 @@ function Game:start_run(args)
     G.GAME.odyssey_king_of_kings_active = G.GAME.odyssey_king_of_kings_active or 0
     G.GAME.booster_choices = G.GAME.booster_choices or 0
     G.GAME.shop_spectral_count = G.GAME.shop_spectral_count or 0
+    G.GAME.shop_planet_count = G.GAME.shop_planet_count or 0
+    G.GAME.shop_tarot_count = G.GAME.shop_tarot_count or 0
     G.GAME.negative_rate = G.GAME.negative_rate or 0
     G.GAME.skip_reward_multiplier = G.GAME.skip_reward_multiplier or 1
     G.GAME.interest_rate = G.GAME.interest_rate or 0

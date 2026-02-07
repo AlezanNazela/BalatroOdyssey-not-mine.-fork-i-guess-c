@@ -13,7 +13,7 @@ function get_odyssey_lunar_phase()
     local round = G.GAME.round
     
     -- Eclipse starts at round 17 (after 4 full cycles of 4 phases)
-    local adjusted_round = round + 1
+    local adjusted_round = round
     
     if adjusted_round >= 17 then
         return 5, 0 -- Eclipse, no evolution levels
@@ -658,6 +658,16 @@ local old_get_cost = Card.get_cost
 function Card:get_cost()
     local cost = old_get_cost(self)
     if G.GAME.odyssey_astronomer_planets_free and self.ability.set == 'Planet' then return 0 end
+    
+    -- Utopia: Fuzzy Check
+    if (G.GAME.odyssey_utopia_active or 0) > 0 then return 0 end
+    if G.jokers and G.jokers.cards then
+        for _, joker in ipairs(G.jokers.cards) do
+            if joker.config and joker.config.center and joker.config.center.key and string.find(joker.config.center.key, 'utopia') then
+                return 0
+            end
+        end
+    end
     
     -- Odyssey Coupon Joker (j_economy_coupon)
     if G.jokers and G.jokers.cards then

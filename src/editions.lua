@@ -186,16 +186,28 @@ SMODS.Edition({
         text = {"{C:dark_edition}THE ECLIPSE", "{C:chips}+15{} Chips, {C:mult}+15{} Mult, {X:mult,C:white}X4{} Mult"}
     },
     calculate = function(self, card, context)
-        -- FILTRO ESTRICTO: Solo si la carta está puntuando
-      if context.main_scoring and card.area == G.play then
-            return {
-                x_mult = 4,
-                mult = 15,
-                chips = 15,
-                message = "ECLIPSE!",
-                colour = G.C.DARK_EDITION,
-                card = card
-            }
+        -- STRICT FILTER: Only if the card is actually in the scoring hand
+        if context.main_scoring and card.area == G.play then
+            local is_scoring = false
+            if context.scoring_hand then
+                for _, c in ipairs(context.scoring_hand) do
+                    if c == card then 
+                        is_scoring = true 
+                        break 
+                    end
+                end
+            end
+
+            if is_scoring then
+                return {
+                    x_mult = 4,
+                    mult = 15,
+                    chips = 15,
+                    message = "ECLIPSE!",
+                    colour = G.C.DARK_EDITION,
+                    card = card
+                }
+            end
         end
     end
 })

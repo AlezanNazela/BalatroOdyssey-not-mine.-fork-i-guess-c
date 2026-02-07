@@ -450,6 +450,7 @@ for _, t in ipairs(tarots) do
                 end}))
             elseif id == 68 then -- Thief
                 local pool = {}
+                -- 1. Check Jokers & Consumables
                 if G.shop_jokers and G.shop_jokers.cards then
                     for _, v in ipairs(G.shop_jokers.cards) do
                         local is_joker = (v.ability.set == 'Joker' or not v.ability.set)
@@ -460,13 +461,45 @@ for _, t in ipairs(tarots) do
                         end
                     end
                 end
+                -- 2. Check Vouchers
+                if G.shop_vouchers and G.shop_vouchers.cards then
+                    for _, v in ipairs(G.shop_vouchers.cards) do
+                        table.insert(pool, v)
+                    end
+                end
+                -- 3. Check Booster Packs
+                if G.shop_booster and G.shop_booster.cards then
+                    for _, v in ipairs(G.shop_booster.cards) do
+                        table.insert(pool, v)
+                    end
+                end
                 
                 if #pool > 0 then
-                    local _card = pseudorandom_element(pool, pseudoseed('thief'))
-                    local area = (_card.ability.set == 'Joker' or not _card.ability.set) and G.jokers or G.consumeables
-                    _card:add_to_deck()
-                    area:emplace(_card)
-                    _card:juice_up()
+                    local target = pseudorandom_element(pool, pseudoseed('thief'))
+                    
+                    if target.ability.set == 'Booster' then
+                        -- Steal a Pack: Open it immediately
+                        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+                            target:use_bespoke()
+                            return true
+                        end }))
+                    elseif target.ability.set == 'Voucher' then
+                        -- Steal a Voucher: Redeem it immediately (Force cost 0 to skip payment)
+                        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+                            target.cost = 0
+                            target:redeem()
+                            target:start_dissolve()
+                            return true
+                        end }))
+                    else
+                        -- Steal a Joker or Consumable: Create a clean copy in the correct area
+                        local area = (target.ability.set == 'Joker' or not target.ability.set) and G.jokers or G.consumeables
+                        local _card = create_card(target.ability.set, area, nil, nil, nil, nil, target.config.center.key, 'thief')
+                        _card:add_to_deck()
+                        area:emplace(_card)
+                        _card:juice_up()
+                        target:start_dissolve()
+                    end
                 end
             elseif id == 69 then -- Guardian
                 if #highlighted == 1 then
@@ -1066,7 +1099,8 @@ local spectral_logic = {
     [38] = function(card, area, copier) -- Kepler
         for k, v in pairs(G.GAME.hands) do
             if v.level > 1 then
-                update_hand_stats(k, {level = v.level})
+                -- Double the level: Add current level to itself
+                level_up_hand(card, k, nil, v.level)
             end
         end
     end,
@@ -1269,6 +1303,134 @@ local spectral_logic = {
     end,
     [100] = function(card, area, copier) -- Gemini
         G.GAME.odyssey_gemini_active = true
+    end,
+    [93] = function(card, area, copier) -- Yi
+        local hands = {}
+        for k, v in pairs(G.GAME.hands) do
+            if v.played > 0 and v.visible then
+                table.insert(hands, {key = k, played = v.played, level = v.level})
+            end
+        end
+        table.sort(hands, function(a, b) return a.played > b.played end)
+        
+        for i = 1, math.min(#hands, 3) do
+            level_up_hand(card, hands[i].key, nil, 2)
+        end
+    end,
+    [22] = function(card, area, copier) -- Big Bang
+        -- Reset Ante to 1, Round to 1. Keep everything else.
+        G.GAME.round_resets.ante = 1
+        G.GAME.round_resets.blind_states.Small = 'Upcoming'
+        G.GAME.round_resets.blind_states.Big = 'Upcoming'
+        G.GAME.round_resets.blind_states.Boss = 'Upcoming'
+        G.GAME.current_round.ante = 1
+        G.GAME.current_round.round = 1
+        G.GAME.blind:set_blind(G.P_BLINDS.bl_small)
+    end,
+    [49] = function(card, area, copier) -- Turing
+        G.GAME.odyssey_turing_active = true
+        G.FUNCS.get_best_hand(G.hand.cards)
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            G.FUNCS.play_cards()
+            return true
+        end }))
+    end,
+    [51] = function(card, area, copier) -- Feynman
+         G.GAME.odyssey_feynman_per_face = (G.GAME.odyssey_feynman_per_face or 0) + 1
+    end,
+    [58] = function(card, area, copier) -- Tesla
+         G.GAME.odyssey_tesla_active = true
+    end,
+    [70] = function(card, area, copier) -- Musk
+        level_up_hand(card, 'Flush', nil, 7)
+    end,
+    [73] = function(card, area, copier) -- Nakamoto
+        local percent = (pseudorandom('nakamoto') - 0.5) -- -0.5 to 0.5
+        local change = math.floor(G.GAME.dollars * percent)
+        ease_dollars(change, true)
+        card_eval_status_text(card, 'extra', nil, nil, nil, {message = change >= 0 and "+"..change or change})
+    end,
+    [77] = function(card, area, copier) -- Collins
+        G.GAME.odyssey_collins_active = true
+    end,
+    [87] = function(card, area, copier) -- Kelly
+        G.GAME.odyssey_kelly_active = true
+    end,
+    [89] = function(card, area, copier) -- Cristoforetti
+        G.GAME.odyssey_cristoforetti_active = true
+    end,
+    [91] = function(card, area, copier) -- Peake
+        for i=1, #G.playing_cards do
+            if G.playing_cards[i].base.suit == 'Spades' then
+                 local ranks = {'J', 'Q', 'K'}
+                 local new_rank = pseudorandom_element(ranks, pseudoseed('peake'))
+                 G.playing_cards[i]:set_base(G.P_CARDS['S_'..new_rank])
+            end
+        end
+    end,
+    [61] = function(card, area, copier) -- Marconi
+         G.GAME.odyssey_marconi_active = true
+    end,
+    [64] = function(card, area, copier) -- Babbage
+        G.GAME.odyssey_babbage_active = true
+    end,
+    [65] = function(card, area, copier) -- Lovelace
+        G.GAME.odyssey_lovelace_active = true
+        -- Immediate effect: Sort deck
+        table.sort(G.deck.cards, function(a, b) return a.base.nominal > b.base.nominal end)
+    end,
+    [67] = function(card, area, copier) -- Berners-Lee
+        G.GAME.odyssey_berners_active = true
+        if G.jokers and G.jokers.cards then
+            for i=1, #G.jokers.cards do
+                G.jokers.cards[i]:set_eternal(true)
+                G.jokers.cards[i].cost = 0
+                G.jokers.cards[i].sell_cost = 0
+            end
+        end
+    end,
+    [80] = function(card, area, copier) -- Laika
+        local space_terms = {'Space', 'Star', 'Cosmic', 'Planet', 'Moon', 'Sun', 'Rocket', 'Alien', 'Void', 'Galaxy', 'Nebula', 'Astro', 'Comet', 'Meteor'}
+        if G.jokers and G.jokers.cards then
+            for i=1, #G.jokers.cards do
+                local name = G.jokers.cards[i].ability.name
+                for _, term in ipairs(space_terms) do
+                    if name:find(term) then
+                        G.jokers.cards[i]:set_eternal(true)
+                        break
+                    end
+                end
+            end
+        end
+    end,
+    [81] = function(card, area, copier) -- Ham
+        G.GAME.odyssey_ham_active = true
+        if G.jokers and G.jokers.cards then
+            for i=1, #G.jokers.cards do
+                G.jokers.cards[i]:set_edition(nil, true)
+            end
+        end
+        if G.playing_cards then
+             for i=1, #G.playing_cards do
+                G.playing_cards[i]:set_edition(nil, true)
+            end
+        end
+    end,
+    [84] = function(card, area, copier) -- Leonov
+         G.GAME.odyssey_leonov_active = true
+    end,
+    [86] = function(card, area, copier) -- Hadfield
+         -- Rework: +50 Chips to all Jokers
+         if G.jokers and G.jokers.cards then
+            for i=1, #G.jokers.cards do
+                local j = G.jokers.cards[i]
+                if not j.ability.extra then j.ability.extra = {} end
+                if type(j.ability.extra) == 'table' then
+                    j.ability.extra.chips = (j.ability.extra.chips or 0) + 50
+                end
+                card_eval_status_text(j, 'extra', nil, nil, nil, {message = "+50 Chips"})
+            end
+         end
     end,
 }
 

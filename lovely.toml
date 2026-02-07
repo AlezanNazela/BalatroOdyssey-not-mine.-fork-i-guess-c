@@ -137,7 +137,7 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = "G.shop_jokers.config.card_limit = G.GAME.shop.joker_max"
 position = "at"
-payload = "G.shop_jokers.config.card_limit = (G.GAME.blind and G.GAME.blind.key == 'blind_odyssey_blind_80') and 0 or G.GAME.shop.joker_max"
+payload = "G.shop_jokers.config.card_limit = ((G.GAME.blind and G.GAME.blind.key == 'blind_odyssey_blind_80') and 0 or G.GAME.shop.joker_max) + (G.GAME.shop_tarot_count or 0) + (G.GAME.shop_planet_count or 0) + (G.GAME.shop_spectral_count or 0)"
 match_indent = true
 
 [[patches]]
@@ -145,7 +145,7 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = "for i = #G.shop_jokers.cards, G.GAME.shop.joker_max+1, -1 do"
 position = "at"
-payload = "for i = #G.shop_jokers.cards, ((G.GAME.blind and G.GAME.blind.key == 'blind_odyssey_blind_80') and 0 or G.GAME.shop.joker_max)+1, -1 do"
+payload = "for i = #G.shop_jokers.cards, ((G.GAME.blind and G.GAME.blind.key == 'blind_odyssey_blind_80') and 0 or (G.GAME.shop.joker_max + (G.GAME.shop_tarot_count or 0) + (G.GAME.shop_planet_count or 0) + (G.GAME.shop_spectral_count or 0)))+1, -1 do"
 match_indent = true
 
 [[patches]]
@@ -153,7 +153,32 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = "for i = 1, G.GAME.shop.joker_max - #G.shop_jokers.cards do"
 position = "at"
-payload = "for i = 1, ((G.GAME.blind and G.GAME.blind.key == 'blind_odyssey_blind_80') and 0 or G.GAME.shop.joker_max) - #G.shop_jokers.cards do"
+payload = '''
+    for i = 1, ((G.GAME.blind and G.GAME.blind.key == 'blind_odyssey_blind_80') and 0 or G.GAME.shop.joker_max) - #G.shop_jokers.cards do
+        local card = create_card('Joker', G.shop_jokers, nil, nil, nil, nil, nil, 'shop')
+        card:add_to_deck()
+        G.shop_jokers:emplace(card)
+    end
+    -- Odyssey: Spawn extra Tarot cards from vouchers
+    for i = 1, (G.GAME.shop_tarot_count or 0) do
+        local card = create_card('Tarot', G.shop_jokers, nil, nil, nil, nil, nil, 'shop')
+        card:add_to_deck()
+        G.shop_jokers:emplace(card)
+    end
+    -- Odyssey: Spawn extra Planet cards from vouchers
+    for i = 1, (G.GAME.shop_planet_count or 0) do
+        local card = create_card('Planet', G.shop_jokers, nil, nil, nil, nil, nil, 'shop')
+        card:add_to_deck()
+        G.shop_jokers:emplace(card)
+    end
+    -- Odyssey: Spawn extra Spectral cards from vouchers
+    for i = 1, (G.GAME.shop_spectral_count or 0) do
+        local card = create_card('Spectral', G.shop_jokers, nil, nil, nil, nil, nil, 'shop')
+        card:add_to_deck()
+        G.shop_jokers:emplace(card)
+    end
+    if false then
+'''
 match_indent = true
 
 [[patches]]

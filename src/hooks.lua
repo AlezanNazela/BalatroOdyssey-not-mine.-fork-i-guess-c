@@ -683,6 +683,24 @@ Card.set_cost = function(self)
        (self.area == G.shop_jokers or self.area == G.shop_vouchers or self.area == G.shop_booster) then
         self.cost = math.floor(self.cost * G.GAME.modifiers.odyssey_shop_price_mult)
     end
+    -- Odyssey Utopia Safety Guard
+    local utopia_active = (G.GAME.odyssey_utopia_active or 0) > 0
+    if G.jokers and G.jokers.cards then
+        for _, joker in ipairs(G.jokers.cards) do
+             -- Let's see exactly what the mod sees
+             if joker.config and joker.config.center then
+                 print("DEBUG: Owned Joker Key: " .. tostring(joker.config.center.key))
+             end
+             if joker.config and joker.config.center and joker.config.center.key and string.find(string.lower(joker.config.center.key), 'utopia') then
+                utopia_active = true
+             end
+        end
+    end
+
+    if utopia_active then
+        print("DEBUG: Utopia Active - Setting cost to 0 for " .. tostring(self.ability and self.ability.name or "Unknown Card"))
+        self.cost = 0
+    end
 end
 
 -- 15. Card:set_ability (For Midas Deck)
@@ -1843,6 +1861,11 @@ Card.get_chip_mult = function(self)
              end
         end
     end
+    -- Ham: +4 Mult to all cards
+    if G.GAME.odyssey_ham_active then
+        ret = ret + 4
+    end
+
     return ret
 end
 
@@ -1857,6 +1880,8 @@ function Card.update(self, dt) -- Usamos punto (.) para control total de paráme
     if self.edition and LunarEffects then
         LunarEffects:update(self, dt)
     end
+
+end
 
 -- 17. Hand Evaluation Hook (For Dimensional Merge)
 -- Used to upgrade 'Two Pair' to 'Four of a Kind' if joker is present
@@ -1875,4 +1900,53 @@ G.FUNCS.get_poker_hand_info = function(_cards)
     end
 
     return text, loc_text, disp_text, poker_hands, scoring_hand, disp_scoring_hand
+end
+
+-- 18. Level Up Hand Hook (For Guru Joker)
+local old_level_up_hand = level_up_hand
+function level_up_hand(card, hand, instant, amount)
+    if old_level_up_hand then old_level_up_hand(card, hand, instant, amount) end
+    
+    if G.jokers and G.jokers.cards then
+        for i = 1, #G.jokers.cards do
+            G.jokers.cards[i]:calculate_joker({level_up = true, handname = hand, amount = amount})
+        end
+    end
+end
+
+-- 19. Ham Hook (Chips)
+local old_get_chip_bonus = Card.get_chip_bonus
+function Card.get_chip_bonus(self)
+    local ret = 0
+    if old_get_chip_bonus then ret = old_get_chip_bonus(self) end
+    if G.GAME.odyssey_ham_active then
+        ret = ret + 100
+    end
+    -- Tesla: Random chips (0-350)
+    if G.GAME.odyssey_tesla_active then
+        ret = ret + (pseudorandom('tesla') * 350)
+    end
+    return ret
+end
+
+-- 20. Leonov Hook (Return Played Card)
+local old_draw_from_play_to_discard = G.FUNCS.draw_from_play_to_discard
+G.FUNCS.draw_from_play_to_discard = function(e)
+    if G.GAME.odyssey_leonov_active then
+        -- Find highest rank card in play
+        local highest = nil
+        for k, v in ipairs(G.play.cards) do
+            if not highest or v.base.nominal > highest.base.nominal then
+                highest = v
+            end
+        end
+        if highest then
+            -- Move to hand manually before discard logic runs
+            G.play:remove_card(highest)
+            G.hand:emplace(highest)
+            card_eval_status_text(highest, 'extra', nil, nil, nil, {message = localize('k_safe_ex'), colour = G.C.GREEN})
+            G.GAME.odyssey_leonov_active = false -- Consume effect
+        end
+    end
+    old_draw_from_play_to_discard(e)
 end
